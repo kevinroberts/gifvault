@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+<AnchorPane prefHeight="247.0" prefWidth="525.0" styleClass="custom-pane" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vinberts.gifvault.controllers.about.AboutController">
+   <children>
+      <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="163.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../gifVaultLogo.png" />
+         </image>
+      </ImageView>
+      <Text fill="WHITE" layoutX="172.0" layoutY="117.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Built with love by Kevin Roberts" textAlignment="CENTER">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Text>
+      <HBox spacing="5" alignment="CENTER" layoutX="14.0" layoutY="133.0" prefHeight="100.0" prefWidth="486.0">
+         <children>
+            <JFXButton onAction="#loadPersonalSite" mnemonicParsing="false" text="Personal Site" />
+            <JFXButton onAction="#loadGithubPage" mnemonicParsing="false" text="Github Page" />
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

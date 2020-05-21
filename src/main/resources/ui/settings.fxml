@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXSpinner?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.StackPane?>
+<StackPane xmlns="http://javafx.com/javafx"
+           xmlns:fx="http://javafx.com/fxml"
+           stylesheets="@../style.css"
+           fx:controller="com.vinberts.gifvault.controllers.settings.SettingsController"
+           prefHeight="459.0" prefWidth="640.0">
+    <children>
+        <TabPane nodeOrientation="LEFT_TO_RIGHT" prefWidth="640">
+            <tabs>
+                <Tab closable="false" styleClass="settings-tab" text="Main Settings">
+                    <content>
+                        <GridPane styleClass="custom-pane" hgap="10" vgap="20">
+                            <padding>
+                                <Insets top="25" right="25" bottom="25" left="25"/>
+                            </padding>
+                            <children>
+                                <Label text="Gif Vault Folder Location:" GridPane.columnIndex="0"  GridPane.rowIndex="0" />
+                                <JFXTextField fx:id="gifVaultFolderField" prefWidth="300" labelFloat="true" text="/users/kevin/movies/gifs" promptText="folder location"
+                                              GridPane.columnIndex="1" GridPane.rowIndex="0" />
+                                <JFXButton fx:id="browseGifVaultFolderButton" onAction="#handleSetVaultFolderAction" text="Change folder"
+                                           GridPane.rowIndex="0" GridPane.columnIndex="2" />
+                                <Label text="Giphy API Key:" GridPane.columnIndex="0"  GridPane.rowIndex="1" />
+                                <JFXTextField fx:id="giphyAPIKeyField" prefWidth="300"  labelFloat="true" text="12345" promptText="Giphy API Key"
+                                              GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                <JFXButton fx:id="saveSettingsButton" onAction="#handleSavePreferencesAction" text="Save changes"
+                                           GridPane.rowIndex="2" GridPane.columnIndex="1" />
+                            </children>
+                        </GridPane>
+                    </content>
+                </Tab>
+                <Tab closable="false" styleClass="settings-tab" text="Export">
+                    <content>
+                        <AnchorPane id="AnchorPane" styleClass="custom-pane">
+                            <children>
+                                <JFXButton layoutX="200.0" layoutY="129.0" onAction="#handleDatabaseExportAction" prefHeight="60.0" prefWidth="185.0" text="Export Database" />
+                                <JFXSpinner fx:id="progressSpinner" layoutX="268.0" layoutY="207.0" visible="false" />
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </children>
+</StackPane>

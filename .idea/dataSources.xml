@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="gifvaultdb" uuid="c33e91b9-97a4-4eff-bff0-b7e2f216cb46">
+      <driver-ref>h2.unified</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.h2.Driver</jdbc-driver>
+      <jdbc-url>jdbc:h2:./gifvaultdb;MV_STORE=false</jdbc-url>
+    </data-source>
+  </component>
+</project>

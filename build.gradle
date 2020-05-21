@@ -1,0 +1,97 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.8'
+    id 'org.beryx.jlink' version '2.12.0'
+}
+
+applicationName = "Gif Vault"
+sourceCompatibility = 11
+targetCompatibility = 11
+group 'com.vinberts'
+version '1.0-SNAPSHOT'
+
+
+applicationDefaultJvmArgs = ['--add-exports', 'javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix',
+                             '--add-exports', 'javafx.controls/com.sun.javafx.scene.control=com.jfoenix',
+                             '--add-exports', 'javafx.base/com.sun.javafx.binding=com.jfoenix',
+                             '--add-exports', 'javafx.graphics/com.sun.javafx.stage=com.jfoenix',
+                             '--add-exports', 'javafx.graphics/com.sun.javafx.scene=com.jfoenix',
+                             '--add-opens', 'javafx.controls/javafx.scene.control.skin=org.controlsfx.controls',
+                             '--add-exports', 'javafx.base/com.sun.javafx.event=org.controlsfx.controls',
+                             '--add-exports', 'javafx.base/com.sun.javafx.event=com.jfoenix']
+
+repositories {
+    mavenCentral()
+    maven {
+        url 'https://jitpack.io'
+    }
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+mainClassName = "$moduleName/com.vinberts.gifvault.MainApp"
+
+javafx {
+    version = "14.0.1"
+    modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.media', 'javafx.web' ]
+}
+
+dependencies {
+    // https://github.com/jfoenixadmin/JFoenix / https://mvnrepository.com/artifact/com.jfoenix/jfoenix
+    compile group: 'com.jfoenix', name: 'jfoenix', version: '9.0.9'
+    // https://mvnrepository.com/artifact/org.controlsfx/controlsfx
+    compile (group: 'org.controlsfx', name: 'controlsfx', version: '11.0.1') {
+        exclude group: 'org.openjfx'
+    }
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.10'
+    // VLC for JavaFx - use for displaying MP4s from Gif providers
+    // https://mvnrepository.com/artifact/uk.co.caprica/vlcj-javafx
+    compile (group: 'uk.co.caprica', name: 'vlcj-javafx', version: '1.0.2')
+    // https://mvnrepository.com/artifact/de.jensd/fontawesomefx
+    compile group: 'de.jensd', name: 'fontawesomefx', version: '8.9'
+
+    // curl impl in java
+    // https://mvnrepository.com/artifact/com.github.rockswang/java-curl
+    compile group: 'com.github.rockswang', name: 'java-curl', version: '1.2.2.2'
+
+    // requirements for hibernate to run
+    // https://mvnrepository.com/artifact/net.bytebuddy/byte-buddy
+    compile group: 'net.bytebuddy', name: 'byte-buddy', version: '1.10.10'
+    // https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
+    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    // https://mvnrepository.com/artifact/com.fasterxml/classmate
+    compile group: 'com.fasterxml', name: 'classmate', version: '1.5.1'
+    /// end required libs for hibernate
+
+    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.4.15.Final'
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    compile group: 'com.google.code.gson', name: 'gson', version: '2.8.5'
+    compile group: 'commons-io', name: 'commons-io', version: '2.6'
+    compile (name:'giphy4j', version: '1.2.1-SNAPSHOT', ext:'jar')
+    compile (name:'h2', version: '1.4.200', ext:'jar')
+    // SLF4J as a facade over Log4j2 required dependencies
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.0'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.0'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.11.0'
+
+    // Bridges from other logging implementations to SLF4J. Be careful not to bridge SLF4J to log4j2 in the other direction by mistake.
+    compile group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.25' // JUL bridge
+    compile group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25' // Apache Commons Logging (JCL) bridge
+    compile group: 'org.slf4j', name: 'log4j-over-slf4j', version: '1.7.25' // log4j1.2 bridge
+
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+    testCompileOnly 'org.projectlombok:lombok:1.18.12'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
+}
+
+jlink {
+    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+    launcher {
+        name = 'gifvault'
+    }
+}
