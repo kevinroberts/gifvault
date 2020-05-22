@@ -21,13 +21,14 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.TextAlignment;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -54,12 +55,6 @@ public class MainAppController {
     private MenuBar mainMenuBar;
 
     @FXML
-    private AnchorPane giphyPane;
-
-    @FXML
-    private AnchorPane vaultPane;
-
-    @FXML
     private JFXTabPane tabPane;
 
     @FXML
@@ -70,6 +65,7 @@ public class MainAppController {
 
     private final double tabWidth = 90.0;
     public static int lastSelectedTabIndex = 0;
+    private Map<String, Object> tabControllerMap = new HashMap<String, Object>();
 
     public void initialize() {
         //init menu
@@ -93,14 +89,78 @@ public class MainAppController {
             }
         };
 
+        tabPane.getSelectionModel().clearSelection();
 
-        configureTabWithImage(giphyTab, "Giphy", "giphy-logo.png", giphyPane,
-                MainAppController.class.getResource("/ui/giphyPane.fxml"), onTabSelectionChange);
-        configureTabWithImage(vaultTab, "Vault", "lock.png", vaultPane,
-                MainAppController.class.getResource("/ui/vaultPane.fxml"), onTabSelectionChange);
+        tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            String tabSelected = newValue.getId();
+            log.info("Tab selected: " + tabSelected);
+            if (newValue.getContent() == null) {
+                switch (tabSelected) {
+                    case "giphyTab":
+                        log.info("loading giphy tab");
+                        loadTab(newValue,
+                                MainAppController.class.getResource("/ui/giphyPane.fxml"));
+                        break;
+                    case "vaultTab":
+                        log.info("loading vault tab");
+                        loadTab(newValue,
+                                MainAppController.class.getResource("/ui/vaultPane.fxml"));
+                        break;
+                    default:
+                        log.error("invalid tab selected: " + tabSelected);
+                        break;
+                }
+            } else {
+                // Content is already loaded. Update the tab if necessary.
+                // could unload videos from other tabs
+                // Parent root = (Parent) newValue.getContent();
+                switch (tabSelected) {
+                    case "vaultTab":
+                        log.info("vault tab selected - already loaded state");
+                        // VaultController vaultController = (VaultController) tabControllerMap.get(tabSelected);
+                        // reload current filter
+                        // vaultController.doFilterAction(null);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+        // By default, select 1st tab and load its content.
+        tabPane.getSelectionModel().selectFirst();
+
+        configureTabWithImage(giphyTab, "Giphy", "giphy-logo.png", onTabSelectionChange);
+        configureTabWithImage(vaultTab, "Vault", "lock.png", onTabSelectionChange);
 
         giphyTab.setStyle("-fx-background-color: -fx-focus-color;");
 
+    }
+
+    private void loadTab(Tab newTab, URL resourceURL) {
+        try {
+            Parent contentView;
+            FXMLLoader loader = new FXMLLoader(resourceURL);
+            if (resourceURL.toString().endsWith("giphyPane.fxml")) {
+                loader.setControllerFactory((type) -> {
+                    GiphyController controller = new GiphyController();
+                    controller.setMainAppController(this);
+                    return controller;
+                });
+            }
+            if (resourceURL.toString().endsWith("vaultPane.fxml")) {
+                loader.setControllerFactory((type) -> {
+                    VaultController controller = new VaultController();
+                    controller.setMainAppController(this);
+                    return controller;
+                });
+            }
+            contentView = loader.load();
+            tabControllerMap.put(newTab.getId(), loader.getController());
+            // Loading content on demand
+            newTab.setContent(contentView);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void initMenu() {
@@ -115,7 +175,7 @@ public class MainAppController {
         });
     }
 
-    private void configureTabWithImage(Tab tab, String title, String iconPath, AnchorPane containerPane, URL resourceURL, EventHandler<Event> onSelectionChangedEvent) {
+    private void configureTabWithImage(Tab tab, String title, String iconPath, EventHandler<Event> onSelectionChangedEvent) {
         double imageWidth = 20.0;
 
         ImageView imageView = new ImageView(new Image(iconPath));
@@ -138,35 +198,6 @@ public class MainAppController {
         tab.setGraphic(tabPane);
 
         tab.setOnSelectionChanged(onSelectionChangedEvent);
-
-        if (containerPane != null && resourceURL != null) {
-            try {
-                Parent contentView;
-                FXMLLoader loader = new FXMLLoader(resourceURL);
-                if (resourceURL.toString().endsWith("giphyPane.fxml")) {
-                    loader.setControllerFactory((type) -> {
-                        GiphyController controller = new GiphyController();
-                        controller.setMainAppController(this);
-                        return controller;
-                    });
-                }
-                if (resourceURL.toString().endsWith("vaultPane.fxml")) {
-                    loader.setControllerFactory((type) -> {
-                        VaultController controller = new VaultController();
-                        controller.setMainAppController(this);
-                        return controller;
-                    });
-                }
-                contentView = loader.load();
-
-                containerPane.getChildren().add(contentView);
-
-                AnchorPane.setTopAnchor(contentView, 0.0);
-                AnchorPane.setLeftAnchor(contentView, 0.0);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     public void showSpinner() {
@@ -177,7 +208,11 @@ public class MainAppController {
         spinner.setOpacity(0);
     }
 
-    public AnchorPane getVaultPane() {
-        return vaultPane;
+    public Tab getVaultTab() {
+        return vaultTab;
+    }
+
+    public Tab getGiphyTab() {
+        return giphyTab;
     }
 }

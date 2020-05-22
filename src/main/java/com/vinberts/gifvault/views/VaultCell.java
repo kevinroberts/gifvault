@@ -20,7 +20,6 @@ import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
 import java.util.Objects;
 
-import static com.vinberts.gifvault.utils.AppConstants.HEARTED_CLASS;
 import static de.jensd.fx.glyphs.GlyphsDude.createIcon;
 import static uk.co.caprica.vlcj.javafx.videosurface.ImageViewVideoSurfaceFactory.videoSurfaceForImageView;
 
@@ -81,7 +80,6 @@ public class VaultCell extends VBox {
         Text trashIcon =
                 createIcon(FontAwesomeIcon.TRASH, "10pt");
         removeButton.setGraphic(trashIcon);
-        removeButton.getStyleClass().add(HEARTED_CLASS);
 
         borderPane = new BorderPane();
         borderPane.setLeft(label);

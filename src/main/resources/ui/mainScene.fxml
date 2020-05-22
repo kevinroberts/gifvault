@@ -31,14 +31,8 @@
                 <JFXTabPane AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="28.0" fx:id="tabPane" side="LEFT" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
                         <Tab fx:id="giphyTab" text="Giphy" closable="false">
-                            <content>
-                                <AnchorPane styleClass="pane" fx:id="giphyPane" minWidth="-Infinity" prefWidth="1000.0" />
-                            </content>
                         </Tab>
                         <Tab fx:id="vaultTab" text="Vault" closable="false">
-                            <content>
-                                <AnchorPane styleClass="pane" fx:id="vaultPane" minWidth="-Infinity" prefWidth="1000.0" />
-                            </content>
                         </Tab>
                     </tabs>
                 </JFXTabPane>

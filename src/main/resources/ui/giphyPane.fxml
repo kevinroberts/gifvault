@@ -10,7 +10,7 @@
 <?import org.controlsfx.control.GridView?>
 <?import java.lang.String?>
 <?import javafx.scene.layout.VBox?>
-<AnchorPane stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vinberts.gifvault.controllers.gihpy.GiphyController">
+<AnchorPane fx:id="giphyPane" styleClass="pane" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vinberts.gifvault.controllers.gihpy.GiphyController">
    <children>
       <VBox prefWidth="1000.0">
          <children>

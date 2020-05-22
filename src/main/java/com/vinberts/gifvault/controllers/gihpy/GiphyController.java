@@ -27,6 +27,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Node;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
 import lombok.extern.slf4j.Slf4j;
@@ -56,6 +57,9 @@ import static de.jensd.fx.glyphs.GlyphsDude.createIcon;
  */
 @Slf4j
 public class GiphyController extends ChildController {
+
+    @FXML
+    private AnchorPane giphyPane;
 
     @FXML
     private JFXButton nextPageButton;
@@ -121,8 +125,8 @@ public class GiphyController extends ChildController {
         gridView.setPrefHeight(Region.USE_COMPUTED_SIZE);
         ObservableList<GiphyCell> list = FXCollections.observableArrayList();
 
-        // set focus to search field by default
         Platform.runLater(() -> {
+            // set focus to search field by default
             searchGiphyTextField.requestFocus();
             try {
                 Giphy giphy = new Giphy(System.getProperty(GIPHY_API_KEY_PROP));
@@ -142,74 +146,83 @@ public class GiphyController extends ChildController {
         });
 
         // initialize grid view events
-        gridView.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
-            EventTarget comp = event.getTarget();
-            Node node = event.getPickResult().getIntersectedNode();
-            // check if this is a grid cell
-            if (comp instanceof GridCell) {
-                log.debug("Grid cell clicked");
-                GridCell gridCell = ((GridCell) comp);
-                GiphyCell cell = (GiphyCell) gridCell.getGraphic();
-                if (node instanceof Text) {
-                    String anchorLink = cell.getAnchorLink();
-                    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+        gridView.addEventFilter(MouseEvent.MOUSE_RELEASED, this::handleGridActionEvent);
+
+        giphyPane.addEventHandler(FavoritedEvent.UNFAVORITED, event -> {
+            log.info("Un-favorite event handled for gif vault item");
+            ObservableList<GiphyCell> gridItems = gridView.getItems();
+            gridItems.removeIf(cell -> cell.getGiphyData().getId().equals(event.getGifVault().getGiphyGif().getId()));
+            gridView.setItems(gridItems);
+        });
+    }
+
+    private void handleGridActionEvent(MouseEvent event) {
+        EventTarget comp = event.getTarget();
+        Node node = event.getPickResult().getIntersectedNode();
+        // check if this is a grid cell
+        if (comp instanceof GridCell) {
+            log.debug("Grid cell clicked");
+            GridCell gridCell = ((GridCell) comp);
+            GiphyCell cell = (GiphyCell) gridCell.getGraphic();
+            if (node instanceof Text) {
+                String anchorLink = cell.getAnchorLink();
+                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                    try {
+                        URI url = URI.create(anchorLink);
+                        Desktop.getDesktop().browse(url);
+                    } catch (IOException ex) {
+                        log.error("IOException occurred", ex);
+                    }
+                }
+            } else if (node instanceof JFXButton) {
+                if (!node.getStyleClass().contains(HEARTED_CLASS)) {
+                    log.debug("adding gif as favorite");
+                    GifFolder folder = DatabaseHelper.getUncategorizedFolder();
+                    GifVault gifVault = AppUtils.prepareNewVaultEntryForGif(Optional.of(folder), cell);
+                    DatabaseHelper.insertNewGifVaultEntry(gifVault);
+
+                    boolean success = DatabaseHelper.insertNewGiphyEntry(cell, gifVault);
+                    if (!success) {
+                        AlertMaker.showErrorMessage("Oops", "Something went wrong trying to add this giphy to your favorites.");
+                    } else {
+                        FavoritedEvent favoritedEvent = new FavoritedEvent(cell, this.getMainAppController().getVaultTab().getContent(), FavoritedEvent.FAVORITED, gifVault);
+                        Text heartIcon =
+                                createIcon(FontAwesomeIcon.HEART, "10pt");
+                        ((JFXButton) node).setGraphic(heartIcon);
+                        node.setAccessibleText(FAVED_TEXT);
+                        node.getStyleClass().add(HEARTED_CLASS);
                         try {
-                            URI url = URI.create(anchorLink);
-                            Desktop.getDesktop().browse(url);
-                        } catch (IOException ex) {
-                            log.error("IOException occurred", ex);
+                            AppUtils.createFaveFolderAndDownloadAsset(gifVault,
+                                    cell.getGiphyData().getImages().getOriginalMp4().getMp4(),
+                                    cell.getGiphyData().getImages().getOriginal().getUrl(),
+                                    this.getMainAppController().getVaultTab(),
+                                    favoritedEvent);
+                        } catch (IOException e) {
+                            AlertMaker.showErrorMessage("Oops", "Something went wrong trying to add this giphy to your favorites.");
                         }
                     }
-                } else if (node instanceof JFXButton) {
-                    if (!node.getStyleClass().contains(HEARTED_CLASS)) {
-                        log.debug("adding gif as favorite");
-                        GifFolder folder = DatabaseHelper.getUncategorizedFolder();
-                        GifVault gifVault = AppUtils.prepareNewVaultEntryForGif(Optional.of(folder), cell);
-                        DatabaseHelper.insertNewGifVaultEntry(gifVault);
-
-                        boolean success = DatabaseHelper.insertNewGiphyEntry(cell, gifVault);
-                        if (!success) {
-                            AlertMaker.showErrorMessage("Oops", "Something went wrong trying to add this giphy to your favorites.");
-                        } else {
-                            FavoritedEvent favoritedEvent = new FavoritedEvent(cell, this.getMainAppController().getVaultPane(), FavoritedEvent.FAVORITED, gifVault);
-                            Text heartIcon =
-                                    createIcon(FontAwesomeIcon.HEART, "10pt");
-                            ((JFXButton) node).setGraphic(heartIcon);
-                            node.setAccessibleText(FAVED_TEXT);
-                            node.getStyleClass().add(HEARTED_CLASS);
-                            try {
-                                AppUtils.createFaveFolderAndDownloadAsset(gifVault,
-                                        cell.getGiphyData().getImages().getOriginalMp4().getMp4(),
-                                        cell.getGiphyData().getImages().getOriginal().getUrl(),
-                                        this.getMainAppController().getVaultPane(),
-                                        favoritedEvent);
-                            } catch (IOException e) {
-                                AlertMaker.showErrorMessage("Oops", "Something went wrong trying to add this giphy to your favorites.");
-                            }
-                        }
-                    } else if (node.getStyleClass().contains(HEARTED_CLASS)) {
-                        log.debug("removing gif as favorite");
-                        String vaultId = DatabaseHelper.deleteGiphyGifById(cell.getGiphyData().getId());
-                        if (StringUtils.isNotEmpty(vaultId)) {
-                            GifVault vaultToBeRemoved = new GifVault();
-                            vaultToBeRemoved.setId(vaultId);
-                            FavoritedEvent unFaveEvent = new FavoritedEvent(cell,
-                                    this.getMainAppController().getVaultPane(),
-                                    FavoritedEvent.UNFAVORITED, vaultToBeRemoved);
-                            this.getMainAppController().getVaultPane().fireEvent(unFaveEvent);
-                            DatabaseHelper.deleteGifVaultById(vaultId);
-                            Text heartIcon =
-                                    createIcon(FontAwesomeIcon.HEART_ALT, "10pt");
-                            ((JFXButton) node).setGraphic(heartIcon);
-                            node.setAccessibleText(UNFAVED_TEXT);
-                            node.getStyleClass().remove(HEARTED_CLASS);
-                        } else {
-                            AlertMaker.showErrorMessage("Oops", "Something went wrong trying to remove this giphy to your favorites.");
-                        }
+                } else if (node.getStyleClass().contains(HEARTED_CLASS)) {
+                    log.debug("removing gif as favorite");
+                    String vaultId = DatabaseHelper.deleteGiphyGifById(cell.getGiphyData().getId());
+                    if (StringUtils.isNotEmpty(vaultId)) {
+                        GifVault vaultToBeRemoved = new GifVault();
+                        vaultToBeRemoved.setId(vaultId);
+                        FavoritedEvent unFaveEvent = new FavoritedEvent(cell,
+                                this.getMainAppController().getVaultTab().getContent(),
+                                FavoritedEvent.UNFAVORITED, vaultToBeRemoved);
+                        this.getMainAppController().getVaultTab().getContent().fireEvent(unFaveEvent);
+                        DatabaseHelper.deleteGifVaultById(vaultId);
+                        Text heartIcon =
+                                createIcon(FontAwesomeIcon.HEART_ALT, "10pt");
+                        ((JFXButton) node).setGraphic(heartIcon);
+                        node.setAccessibleText(UNFAVED_TEXT);
+                        node.getStyleClass().remove(HEARTED_CLASS);
+                    } else {
+                        AlertMaker.showErrorMessage("Oops", "Something went wrong trying to remove this giphy to your favorites.");
                     }
                 }
             }
-        });
+        }
     }
 
     public void getTrendingAction(final ActionEvent actionEvent) {

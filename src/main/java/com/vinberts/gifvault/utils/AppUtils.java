@@ -14,8 +14,8 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Tab;
 import javafx.scene.image.Image;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lombok.extern.slf4j.Slf4j;
@@ -150,7 +150,7 @@ public class AppUtils {
         return gifVault;
     }
 
-    public static void createFaveFolderAndDownloadAsset(GifVault gifVault, String mp4URL, String gifUrl, AnchorPane pane, FavoritedEvent event) throws IOException {
+    public static void createFaveFolderAndDownloadAsset(GifVault gifVault, String mp4URL, String gifUrl, Tab tab, FavoritedEvent event) throws IOException {
         SystemPreferences preferences = SystemPreferences.getPreferences();
 
         String year = Integer.toString(Calendar.getInstance().get(Calendar.YEAR));
@@ -185,7 +185,9 @@ public class AppUtils {
             String gifFilePath = containerPath.toString() + File.separator + gifVault.getGifFilename();
             CUrl cUrl2 = new CUrl(gifUrl).output(gifFilePath).timeout(10, 130);
             cUrl2.exec();
-            pane.fireEvent(event);
+            if (Objects.nonNull(tab.getContent())) {
+                tab.getContent().fireEvent(event);
+            }
             log.debug("File " + mp4FilePath + " downloaded");
         }).start();
     }

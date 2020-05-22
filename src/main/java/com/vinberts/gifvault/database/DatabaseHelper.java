@@ -115,7 +115,7 @@ public class DatabaseHelper {
 
     public static List<GifVault> getGifVaultsByFolder(int limit, int offset, GifFolder folder) {
         Session session = HibernateUtil.getSessionFactory().openSession();
-        String hql = "FROM GifVault V WHERE V.folder = :folder";
+        String hql = "FROM GifVault V WHERE V.folder = :folder ORDER BY createdAt desc";
         Query query = session.createQuery(hql);
         query.setMaxResults(limit);
         query.setFirstResult(offset);
