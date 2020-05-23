@@ -1,5 +1,4 @@
-# Gif Vault
-## A Desktop App for Organizing your Favorite Gifs!
+# Gif Vault:  A Desktop App for Organizing your Favorite Gifs!
 
 About
 ===========
