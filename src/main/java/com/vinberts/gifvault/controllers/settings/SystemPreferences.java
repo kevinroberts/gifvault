@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.vinberts.gifvault.utils.AlertMaker;
 import com.vinberts.gifvault.utils.SystemPropertyLoader;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
@@ -12,6 +13,9 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import static com.vinberts.gifvault.utils.AppConstants.GIF_VAULT_FOLDER_LOC_PROP;
@@ -28,6 +32,21 @@ public class SystemPreferences {
 
     public SystemPreferences() {
         SystemPropertyLoader.loadPropValues();
+        Path vaultFolderPath = FileSystems.getDefault().getPath(System.getProperty(GIF_VAULT_FOLDER_LOC_PROP));
+        if (Files.notExists(vaultFolderPath)) {
+            log.info("The specified gif vault location does not exist, creating base directory in User home directory /gifvault");
+            Path fallbackVaultPath = FileSystems.getDefault().getPath(FileUtils.getUserDirectoryPath() + File.separator + "gifvault");
+            if (Files.notExists(fallbackVaultPath)) {
+                try {
+                    Files.createDirectory(fallbackVaultPath);
+                    System.setProperty(GIF_VAULT_FOLDER_LOC_PROP, fallbackVaultPath.toString());
+                } catch (IOException e) {
+                    log.error("Could not create Gif Vault folder location at " + fallbackVaultPath.toString(), e);
+                    System.exit(1);
+                }
+            }
+
+        }
         setGifVaultFolderLocation(System.getProperty(GIF_VAULT_FOLDER_LOC_PROP));
         setGiphyAPIKey(System.getProperty(GIPHY_API_KEY_PROP));
     }

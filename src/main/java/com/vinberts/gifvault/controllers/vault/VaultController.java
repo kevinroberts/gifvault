@@ -18,11 +18,15 @@ import javafx.scene.Node;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
+import javafx.scene.text.Text;
 import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 
+import java.awt.*;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -109,7 +113,17 @@ public class VaultController extends ChildController {
             log.debug("Grid cell clicked");
             GridCell gridCell = ((GridCell) comp);
             VaultCell cell = (VaultCell) gridCell.getGraphic();
-            if (node instanceof JFXButton) {
+            if (node instanceof Text) {
+                String anchorLink = cell.getAnchorLink();
+                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                    try {
+                        URI url = URI.create(anchorLink);
+                        Desktop.getDesktop().browse(url);
+                    } catch (IOException ex) {
+                        log.error("IOException occurred", ex);
+                    }
+                }
+            } else if (node instanceof JFXButton) {
                 log.debug("removing gif from favorites");
                 FavoritedEvent unFaveEvent = new FavoritedEvent(cell,
                         this.getMainAppController().getGiphyTab().getContent(),
