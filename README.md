@@ -1,8 +1,8 @@
-# Gif Vault:  A Desktop App for Organizing your Favorite Gifs!
+# Gif Vault: A Desktop App for Organizing your Favorite Gifs!
 
 About
 ===========
-Gif vault is a search and offline archiving solution for gif files from multiple gif providers. (Only the Giphy platform is available at the moment...)
+Gif Vault is a search and offline archiving solution for gif files from multiple gif providers. (Only the Giphy platform is available at the moment...)
 
 Prerequisites
 ===========
@@ -11,7 +11,7 @@ Prerequisites
 
 Build
 ===========
-* [clone the Video Converter repository](https://help.github.com/articles/cloning-a-repository/)      
+* [clone the Gif Vault repository](https://help.github.com/articles/cloning-a-repository/)      
 * run one of the following commands from the project root:  
 **Build and install the jars in the local repository executing all the unit tests:**   
 `./gradlew build`
