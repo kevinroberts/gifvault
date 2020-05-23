@@ -7,7 +7,7 @@ Gif vault is a search and offline archiving solution for gif files from multiple
 Prerequisites
 ===========
 * [JDK 11](https://openjdk.java.net/). Java 11, Gif Vault uses Java language version 11, you will need a OpenJDK 11 installed on your machine.
-* [VLC](https://www.videolan.org/vlc/index.html) VLC media player (version 3+) needs to be installed in order for this software to run. (VLC is a free and open source cross-platform multimedia player and framework that plays most multimedia files as well as DVDs, Audio CDs, VCDs, and various streaming protocols.)
+* [VLC](https://www.videolan.org/vlc/index.html) media player (version 3+) needs to be installed in order for this software to run. (VLC is a free and open source cross-platform multimedia player and framework that plays most multimedia files as well as DVDs, Audio CDs, VCDs, and various streaming protocols.)
 
 Build
 ===========
