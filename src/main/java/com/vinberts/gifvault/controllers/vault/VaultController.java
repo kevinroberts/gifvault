@@ -338,13 +338,17 @@ public class VaultController extends ChildController {
         if (updated) {
             this.getMainAppController().getNotificationsPane().hide();
             numberOfVaultsSelected = 0;
+            List<VaultCell> cellsToRemove = new ArrayList<>();
             for (VaultCell cell: gridItems) {
                 if (cell.getSelectionBox().isSelected()) {
                     cell.getSelectionBox().setSelected(false);
                     cell.releasePlayer();
-                    gridView.getItems().remove(cell);
+                    cellsToRemove.add(cell);
                 }
             }
+            Platform.runLater(() ->{
+                gridView.getItems().removeAll(cellsToRemove);
+            });
         } else {
             AlertMaker.showErrorMessage("Uhoh", "Something went wrong trying to save gifs to your folder.");
         }
