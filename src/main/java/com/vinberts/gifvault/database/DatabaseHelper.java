@@ -237,6 +237,27 @@ public class DatabaseHelper {
         }
     }
 
+    public static boolean addGifVaultsToFolder(GifFolder folder, Collection<GifVault> vaults) {
+        Transaction transaction = null;
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            transaction = session.beginTransaction();
+            for (GifVault vault: vaults) {
+                vault.setFolder(folder);
+                session.saveOrUpdate(vault);
+            }
+            transaction.commit();
+            session.close();
+            return true;
+        } catch (RuntimeException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            log.error("Exception occurred trying to update gif folder", e);
+            return false;
+        }
+    }
+
     public static boolean removeGifFolderAndTransferItsChildren(GifFolder gifFolder) {
         Transaction transaction = null;
         try {

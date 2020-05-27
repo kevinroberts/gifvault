@@ -333,7 +333,7 @@ public class GiphyController extends ChildController {
         }
     }
 
-    private void releaseAllPlayers() {
+    public void releaseAllPlayers() {
         ObservableList<GiphyCell> currentGifs = gridView.getItems();
         currentGifs.forEach(GiphyCell::releasePlayer);
     }

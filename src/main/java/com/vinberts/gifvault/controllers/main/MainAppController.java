@@ -5,7 +5,6 @@ import com.jfoenix.controls.JFXTabPane;
 import com.vinberts.gifvault.controllers.gihpy.GiphyController;
 import com.vinberts.gifvault.controllers.vault.VaultController;
 import com.vinberts.gifvault.utils.AppUtils;
-import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -31,6 +30,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  *
@@ -97,18 +97,24 @@ public class MainAppController {
 
         tabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             String tabSelected = newValue.getId();
+            String prevTabSelected = Objects.nonNull(oldValue) ? oldValue.getId() : "";
             log.info("Tab selected: " + tabSelected);
             if (newValue.getContent() == null) {
                 switch (tabSelected) {
                     case "giphyTab":
-                        log.info("loading giphy tab");
+                        log.debug("loading giphy tab");
                         loadTab(newValue,
                                 MainAppController.class.getResource("/ui/giphyPane.fxml"));
                         break;
                     case "vaultTab":
-                        log.info("loading vault tab");
+                        log.debug("loading vault tab");
                         loadTab(newValue,
                                 MainAppController.class.getResource("/ui/vaultPane.fxml"));
+                        if (prevTabSelected.equals("giphyTab")) {
+                            log.info("Prev tab was Giphy Tab, releasing all its resources");
+                            GiphyController giphyController = (GiphyController) tabControllerMap.get(prevTabSelected);
+                            giphyController.releaseAllPlayers();
+                        }
                         break;
                     default:
                         log.error("invalid tab selected: " + tabSelected);
@@ -208,29 +214,6 @@ public class MainAppController {
         this.notificationsPane = notificationsPane;
     }
 
-    /**
-     * Show a top banner with a 3 second timeout and the specified text. Must
-     * be called from the UI thread.
-     *
-     * @param text Text to show in the banner.
-     */
-    public void showTopBannerOnUIThread(String text) {
-        notificationsPane.setText(text);
-        notificationsPane.show();
-        // handles resetting the timer if a new banner is shown before the old is
-        // hidden
-        new Thread(() -> {
-            try {
-                Thread.sleep(3000);
-            } catch (InterruptedException ex) {
-                // Ignore
-            }
-            Platform.runLater(() -> {
-                notificationsPane.hide();
-            });
-        }).start();
-    }
-
     public void showSpinner() {
         spinner.setOpacity(1);
     }
@@ -245,5 +228,9 @@ public class MainAppController {
 
     public Tab getGiphyTab() {
         return giphyTab;
+    }
+
+    public NotificationPane getNotificationsPane() {
+        return notificationsPane;
     }
 }

@@ -19,7 +19,9 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventTarget;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -35,6 +37,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
@@ -69,11 +73,15 @@ public class VaultController extends ChildController {
     @FXML
     private JFXComboBox<GifFolder> folderSelectorComboBox;
 
+    private NotificationPaneController notificationPaneController;
+
     private GifFolder[] folderSelectionOptions;
 
     private final int limit = 25;
     private int offset = 0;
     private int resultSize = 25;
+
+    private int numberOfVaultsSelected = 0;
 
     SystemPreferences preferences;
 
@@ -88,6 +96,18 @@ public class VaultController extends ChildController {
         Text icon =
                 createIcon(MaterialIcon.CREATE_NEW_FOLDER, "14pt");
         manageFoldersButton.setGraphic(icon);
+
+        // setup notifications bar
+        FXMLLoader loader = new FXMLLoader(VaultController.class.getResource("/ui/notificationPane.fxml"));
+        try {
+            Parent notificationNode = loader.load();
+            notificationPaneController = loader.getController();
+            notificationPaneController.setVaultController(this);
+            this.getMainAppController().getNotificationsPane().setGraphic(notificationNode);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         gridView.setCellFactory(gifGrid -> new GridCell<VaultCell>() {
             @Override
@@ -191,8 +211,17 @@ public class VaultController extends ChildController {
                 log.debug("handling checkbox action from grid list");
                 if (cell.getSelectionBox().isSelected()) {
                     cell.getSelectionBox().setSelected(false);
+                    if (numberOfVaultsSelected > 0) {
+                        numberOfVaultsSelected--;
+                    }
+                    if (numberOfVaultsSelected == 0) {
+                        this.getMainAppController().getNotificationsPane().hide();
+                    }
                 } else {
                     cell.getSelectionBox().setSelected(true);
+                    numberOfVaultsSelected++;
+                    notificationPaneController.updateInfoText(String.format("Add %d Selected Gifs to Folder:", numberOfVaultsSelected));
+                    this.getMainAppController().getNotificationsPane().show();
                 }
 
             }
@@ -275,10 +304,6 @@ public class VaultController extends ChildController {
                 closeEvent);
     }
 
-    public void addCheckedToFolderAction(final ActionEvent actionEvent) {
-        AlertMaker.showSimpleAlert("Add to folders", "add to folders");
-    }
-
     public void refreshFolders() {
         GifFolder selectedFolder = folderSelectorComboBox.getValue();
         List<GifFolder> gifFolders = DatabaseHelper.getListOfFolders(50, 0, true);
@@ -296,6 +321,32 @@ public class VaultController extends ChildController {
             } else {
                 folderSelectorComboBox.setValue(folderSelectionOptions[0]);
             }
+        }
+    }
+
+    public void addSelectedGifsToFolder(GifFolder folder) {
+        // check if selected folder and add to folder are the same
+        // GifFolder selectedFolder = folderSelectorComboBox.getValue();
+        ObservableList<VaultCell> gridItems = gridView.getItems();
+        Collection<GifVault> selectedVaults = new ArrayList<>();
+        for (VaultCell cell: gridItems) {
+            if (cell.getSelectionBox().isSelected()) {
+                selectedVaults.add(cell.getGifVault());
+            }
+        }
+        boolean updated = DatabaseHelper.addGifVaultsToFolder(folder, selectedVaults);
+        if (updated) {
+            this.getMainAppController().getNotificationsPane().hide();
+            numberOfVaultsSelected = 0;
+            for (VaultCell cell: gridItems) {
+                if (cell.getSelectionBox().isSelected()) {
+                    cell.getSelectionBox().setSelected(false);
+                    cell.releasePlayer();
+                    gridView.getItems().remove(cell);
+                }
+            }
+        } else {
+            AlertMaker.showErrorMessage("Uhoh", "Something went wrong trying to save gifs to your folder.");
         }
     }
 }

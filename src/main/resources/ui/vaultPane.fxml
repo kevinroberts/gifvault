@@ -34,11 +34,6 @@
                                 <Insets left="10.0" top="4.0" />
                             </HBox.margin>
                         </JFXButton>
-                        <JFXButton onAction="#addCheckedToFolderAction" text="Add checked to folder">
-                            <HBox.margin>
-                                <Insets left="10.0" top="4.0" />
-                            </HBox.margin>
-                        </JFXButton>
                         <JFXButton fx:id="manageFoldersButton" onAction="#openFolderManager" text="Manage Folders">
                             <HBox.margin>
                                 <Insets left="15.0" top="4.0" />

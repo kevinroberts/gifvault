@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<AnchorPane minHeight="70" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.vinberts.gifvault.controllers.vault.NotificationPaneController">
+    <children>
+        <HBox spacing="10.0" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="15.0">
+             <children>
+                <ImageView pickOnBounds="true" preserveRatio="true">
+                   <image>
+                      <Image url="@../folders.png" />
+                   </image>
+                    <HBox.margin>
+                        <Insets top="10" />
+                    </HBox.margin>
+                </ImageView>
+                <Pane minWidth="100.0" HBox.hgrow="ALWAYS" />
+                <Label fx:id="infoTextLabel" text="Add 10 Selected Gifs to Folder: ">
+                   <HBox.margin>
+                      <Insets top="10" />
+                   </HBox.margin>
+                </Label>
+                <JFXComboBox fx:id="folderChooserComboBox" />
+                 <JFXButton onAction="#addCheckedToFolderAction" text="Add">
+                     <HBox.margin>
+                         <Insets top="4.0" />
+                     </HBox.margin>
+                 </JFXButton>
+                 <Pane minWidth="100.0" HBox.hgrow="ALWAYS" />
+             </children>
+        </HBox>
+    </children>
+</AnchorPane>
