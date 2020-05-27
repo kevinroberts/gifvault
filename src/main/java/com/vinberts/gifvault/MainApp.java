@@ -14,6 +14,7 @@ import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
 import lombok.extern.slf4j.Slf4j;
+import org.controlsfx.control.NotificationPane;
 
 import javax.swing.*;
 import java.awt.*;
@@ -48,15 +49,22 @@ public class MainApp extends Application {
         FXMLLoader loader = new FXMLLoader(MainApp.class.getResource("/ui/mainScene.fxml"));
         Parent root = loader.load();
         MainAppController appController = loader.getController();
-        Scene mainScene = new Scene(root);
+        NotificationPane notificationPane = new NotificationPane(root);
+        notificationPane.getStylesheets().add("style.css");
+        notificationPane.getStyleClass().add(NotificationPane.STYLE_CLASS_DARK);
+
+        appController.setNotificationsPane(notificationPane);
+
+        Scene mainScene = new Scene(notificationPane);
         primaryStage.setScene(mainScene);
 
         primaryStage.setTitle("Gif Vault");
         AppUtils.setStageIcon(primaryStage);
 
+        primaryStage.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
+
         primaryStage.show();
 
-        primaryStage.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
 
         appController.exitMenuItem.setOnAction(event -> {
             Window window = primaryStage

@@ -5,8 +5,10 @@ import com.vinberts.gifvault.data.GifVault;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.scene.control.CheckBox;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -37,7 +39,9 @@ public class VaultCell extends VBox {
     private HyperlinkLabel label;
     private JFXButton removeButton;
     private GifVault gifVault;
-    private final int maxTitleLen = 45;
+    private CheckBox selectionBox;
+    private HBox controlsContainer;
+    private final int maxTitleLen = 42;
 
     public VaultCell(final GifVault gifSource, String mp4Path) {
         super();
@@ -81,9 +85,16 @@ public class VaultCell extends VBox {
                 createIcon(FontAwesomeIcon.TRASH, "10pt");
         removeButton.setGraphic(trashIcon);
 
+        selectionBox = new CheckBox(" ");
         borderPane = new BorderPane();
+        controlsContainer = new HBox();
+        controlsContainer.getChildren().add(selectionBox);
+        HBox.setMargin(selectionBox, new Insets(5,0,0,0));
+        controlsContainer.getChildren().add(removeButton);
+
         borderPane.setLeft(label);
-        borderPane.setRight(removeButton);
+        borderPane.setRight(controlsContainer);
+
         BorderPane.setMargin(label, new Insets(0,5,0,0));
 
         Platform.runLater(() -> {
@@ -108,4 +119,7 @@ public class VaultCell extends VBox {
         return this.label.getAccessibleText();
     }
 
+    public CheckBox getSelectionBox() {
+        return selectionBox;
+    }
 }

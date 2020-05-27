@@ -203,7 +203,7 @@ public class GiphyController extends ChildController {
                     }
                 } else if (node.getStyleClass().contains(HEARTED_CLASS)) {
                     log.debug("removing gif as favorite");
-                    String vaultId = DatabaseHelper.deleteGiphyGifById(cell.getGiphyData().getId());
+                    String vaultId = DatabaseHelper.deleteGiphyGifById(cell.getGiphyData().getId(), true);
                     if (StringUtils.isNotEmpty(vaultId)) {
                         GifVault vaultToBeRemoved = new GifVault();
                         vaultToBeRemoved.setId(vaultId);

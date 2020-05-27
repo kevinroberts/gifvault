@@ -17,12 +17,15 @@ import org.hibernate.query.Query;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.vinberts.gifvault.utils.AppConstants.GIPHY_DATE_FORMAT;
+import static com.vinberts.gifvault.utils.AppConstants.UNCATEGORIZED;
 
 /**
  *
@@ -121,6 +124,35 @@ public class DatabaseHelper {
         query.setFirstResult(offset);
         query.setParameter("folder", folder);
         List<GifVault> results = query.list();
+        session.close();
+        return results;
+    }
+
+    public static int getNumberOfGifVaultsByFolder(GifFolder folder) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        String hql = "SELECT count(*) as total FROM GifVault V WHERE V.folder = :folder";
+        Query query = session.createQuery(hql);
+        query.setParameter("folder", folder);
+        List results = query.list();
+        return ((Long) results.get(0)).intValue();
+    }
+
+    public static List<GifFolder> getListOfFolders(int limit, int offset, boolean prependUncategorized) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        String hql = "FROM GifFolder F ORDER BY createdAt desc";
+        Query query = session.createQuery(hql);
+        query.setMaxResults(limit);
+        query.setFirstResult(offset);
+        List<GifFolder> results = query.list();
+        session.close();
+
+        if (prependUncategorized) {
+            GifFolder uncatFolder = getUncategorizedFolder();
+            if (results.contains(uncatFolder)) {
+                results.remove(uncatFolder);
+            }
+            results.add(0, uncatFolder);
+        }
         return results;
     }
 
@@ -132,7 +164,7 @@ public class DatabaseHelper {
         return gifOptional;
     }
 
-    public static String deleteGiphyGifById(String id) {
+    public static String deleteGiphyGifById(String id, boolean removeFiles) {
         Optional<GiphyGif> gifOptional = getGiphyGifById(id);
         if (gifOptional.isPresent()) {
             Transaction transaction = null;
@@ -145,8 +177,10 @@ public class DatabaseHelper {
                 query.executeUpdate();
                 transaction.commit();
                 session.close();
-                // remove associated files from gif vault / filesystem
-                AppUtils.removeAssetsFromFileSystem(gifOptional.get().getGifVaultEntry());
+                if (removeFiles) {
+                    // remove associated files from gif vault / filesystem
+                    AppUtils.removeAssetsFromFileSystem(gifOptional.get().getGifVaultEntry());
+                }
                 // return gif vault id for removal
                 return gifOptional.get().getGifVaultEntry().getId();
             } catch (HibernateException e) {
@@ -180,11 +214,88 @@ public class DatabaseHelper {
         }
     }
 
+    public static boolean updateGifFolder(GifFolder gifFolder) {
+        Transaction transaction = null;
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            transaction = session.beginTransaction();
+            String hql = "UPDATE GifFolder set name = :name " +
+                    "WHERE id = :id";
+            Query query = session.createQuery(hql);
+            query.setParameter("name", gifFolder.getName());
+            query.setParameter("id", gifFolder.getId());
+            query.executeUpdate();
+            transaction.commit();
+            session.close();
+            return true;
+        } catch (RuntimeException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            log.error("Exception occurred trying to update gif folder", e);
+            return false;
+        }
+    }
+
+    public static boolean removeGifFolderAndTransferItsChildren(GifFolder gifFolder) {
+        Transaction transaction = null;
+        try {
+            Session session = HibernateUtil.getSessionFactory().openSession();
+            transaction = session.beginTransaction();
+            Collection<GifVault> gifVaultList = gifFolder.getGifVaultEntries();
+            if (Objects.nonNull(gifVaultList) && gifVaultList.size() > 0) {
+                GifFolder uncatFolder = getUncategorizedFolder();
+                uncatFolder.getGifVaultEntries().addAll(gifVaultList);
+                session.saveOrUpdate(uncatFolder);
+            }
+            String hql = "DELETE FROM GifFolder G WHERE G.id = :id";
+            Query query = session.createQuery(hql);
+            query.setParameter("id", gifFolder.getId());
+            query.executeUpdate();
+            transaction.commit();
+            session.close();
+            return true;
+        } catch (RuntimeException e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            log.error("Exception occurred trying to remove gif folder", e);
+            return false;
+        }
+    }
+
+    public static GifFolder getGifFolderByName(String name) {
+        return getGifFolderByName(name, false);
+    }
+
+    public static GifFolder getGifFolderByName(String name, boolean createIfNotFound) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        String hql = "FROM GifFolder F WHERE F.name = :name";
+        Query query = session.createQuery(hql);
+        query.setParameter("name", name);
+        List results = query.list();
+        session.close();
+        if (!results.isEmpty()) {
+            return (GifFolder)results.get(0);
+        } else if (createIfNotFound) {
+            GifFolder gifFolder = new GifFolder();
+            gifFolder.setId(UUID.randomUUID().toString());
+            gifFolder.setName(name);
+            gifFolder.setCreatedAt(new Date());
+            ArrayList<GifVault> gifVaultList = new ArrayList();
+            gifFolder.setGifVaultEntries(gifVaultList);
+            insertNewGifFolder(gifFolder);
+            return gifFolder;
+        } else {
+            return null;
+        }
+    }
+
     public static GifFolder getUncategorizedFolder() {
         Session session = HibernateUtil.getSessionFactory().openSession();
         String hql = "FROM GifFolder F WHERE F.name = :name";
         Query query = session.createQuery(hql);
-        query.setParameter("name","Uncategorized");
+        query.setParameter("name",UNCATEGORIZED);
         List results = query.list();
         session.close();
         GifFolder gifFolder;

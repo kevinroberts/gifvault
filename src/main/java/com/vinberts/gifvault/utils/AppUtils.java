@@ -9,8 +9,10 @@ import com.vinberts.gifvault.data.GifFolder;
 import com.vinberts.gifvault.data.GifVault;
 import com.vinberts.gifvault.events.FavoritedEvent;
 import com.vinberts.gifvault.views.GiphyCell;
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -18,6 +20,7 @@ import javafx.scene.control.Tab;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -76,6 +79,10 @@ public class AppUtils {
     }
 
     public static Object loadWindow(URL loc, String title, Stage parentStage) {
+        return loadWindow(loc, title, parentStage, null);
+    }
+
+    public static Object loadWindow(URL loc, String title, Stage parentStage, EventHandler customEvent) {
         Object controller = null;
         try {
             FXMLLoader loader = new FXMLLoader(loc);
@@ -89,6 +96,9 @@ public class AppUtils {
             }
             stage.setTitle(title);
             stage.setScene(new Scene(parent));
+            if (Objects.nonNull(customEvent)) {
+                stage.addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, customEvent);
+            }
             stage.show();
             setStageIcon(stage);
         } catch (IOException ex) {
@@ -186,7 +196,9 @@ public class AppUtils {
             CUrl cUrl2 = new CUrl(gifUrl).output(gifFilePath).timeout(10, 130);
             cUrl2.exec();
             if (Objects.nonNull(tab.getContent())) {
-                tab.getContent().fireEvent(event);
+                Platform.runLater(()-> {
+                    tab.getContent().fireEvent(event);
+                });
             }
             log.debug("File " + mp4FilePath + " downloaded");
         }).start();

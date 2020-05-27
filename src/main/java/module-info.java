@@ -36,6 +36,7 @@ module gifvault {
     opens com.vinberts.gifvault.controllers.vault to javafx.fxml;
     opens com.vinberts.gifvault.controllers.about to javafx.fxml;
     opens com.vinberts.gifvault.controllers.settings to javafx.fxml;
+    opens com.vinberts.gifvault.controllers.folders to javafx.fxml;
     opens com.vinberts.gifvault.data to org.hibernate.orm.core;
     exports com.vinberts.gifvault;
 }

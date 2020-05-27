@@ -5,6 +5,7 @@ import com.jfoenix.controls.JFXTabPane;
 import com.vinberts.gifvault.controllers.gihpy.GiphyController;
 import com.vinberts.gifvault.controllers.vault.VaultController;
 import com.vinberts.gifvault.utils.AppUtils;
+import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -24,6 +25,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.TextAlignment;
 import lombok.extern.slf4j.Slf4j;
+import org.controlsfx.control.NotificationPane;
 
 import java.io.IOException;
 import java.net.URL;
@@ -35,6 +37,8 @@ import java.util.Map;
  */
 @Slf4j
 public class MainAppController {
+
+    private NotificationPane notificationsPane;
 
     @FXML
     private JFXSpinner spinner;
@@ -198,6 +202,33 @@ public class MainAppController {
         tab.setGraphic(tabPane);
 
         tab.setOnSelectionChanged(onSelectionChangedEvent);
+    }
+
+    public void setNotificationsPane(final NotificationPane notificationsPane) {
+        this.notificationsPane = notificationsPane;
+    }
+
+    /**
+     * Show a top banner with a 3 second timeout and the specified text. Must
+     * be called from the UI thread.
+     *
+     * @param text Text to show in the banner.
+     */
+    public void showTopBannerOnUIThread(String text) {
+        notificationsPane.setText(text);
+        notificationsPane.show();
+        // handles resetting the timer if a new banner is shown before the old is
+        // hidden
+        new Thread(() -> {
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException ex) {
+                // Ignore
+            }
+            Platform.runLater(() -> {
+                notificationsPane.hide();
+            });
+        }).start();
     }
 
     public void showSpinner() {
