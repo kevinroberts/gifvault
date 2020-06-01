@@ -18,6 +18,7 @@ public class CustomCloseEvent implements EventHandler<WindowEvent> {
         log.debug("Custom close event, Refreshing list of folders");
         // refresh list of folders
         vaultController.refreshFolders();
+
     }
 
     public VaultController getVaultController() {

@@ -12,29 +12,30 @@ group 'com.vinberts'
 version '1.0-SNAPSHOT'
 
 
-applicationDefaultJvmArgs = ['--add-exports', 'javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix',
-                             '--add-exports', 'javafx.controls/com.sun.javafx.scene.control=com.jfoenix',
-                             '--add-exports', 'javafx.base/com.sun.javafx.binding=com.jfoenix',
-                             '--add-exports', 'javafx.graphics/com.sun.javafx.stage=com.jfoenix',
-                             '--add-exports', 'javafx.graphics/com.sun.javafx.scene=com.jfoenix',
-                             '--add-opens', 'javafx.controls/javafx.scene.control.skin=org.controlsfx.controls',
-                             '--add-exports', 'javafx.base/com.sun.javafx.event=com.jfoenix',
-                             // ControlsFX required exports
-                             // For various usages of TraversalEngine
-                             '--add-exports', 'javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls',
-                             "--add-exports", "javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
-                             // For various behaviors across controls
-                             "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls",
-                             // For ReadOnlyUnbackedObservableList across files
-                             "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls",
-                             // For InputMap used in behavior classes
-                             "--add-exports", "javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls",
-                             // For EventHandlerManager in AutoCompletionBinding
-                             "--add-exports", "javafx.base/com.sun.javafx.event=org.controlsfx.controls",
-                             // For MappingChange, NonIterableChange across files
-                             "--add-exports", "javafx.base/com.sun.javafx.collections=org.controlsfx.controls",
-                             // For VersionInfo in VersionChecker
-                             "--add-exports", "javafx.base/com.sun.javafx.runtime=org.controlsfx.controls"]
+applicationDefaultJvmArgs = [
+        '--add-exports', 'javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix',
+        '--add-exports', 'javafx.controls/com.sun.javafx.scene.control=com.jfoenix',
+        '--add-exports', 'javafx.base/com.sun.javafx.binding=com.jfoenix',
+        '--add-exports', 'javafx.graphics/com.sun.javafx.stage=com.jfoenix',
+        '--add-exports', 'javafx.graphics/com.sun.javafx.scene=com.jfoenix',
+        '--add-opens', 'javafx.controls/javafx.scene.control.skin=org.controlsfx.controls',
+        '--add-exports', 'javafx.base/com.sun.javafx.event=com.jfoenix',
+        // ControlsFX required exports
+        // For various usages of TraversalEngine
+        '--add-exports', 'javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls',
+        "--add-exports", "javafx.graphics/com.sun.javafx.scene.traversal=org.controlsfx.controls",
+        // For various behaviors across controls
+        "--add-exports", "javafx.controls/com.sun.javafx.scene.control.behavior=org.controlsfx.controls",
+        // For ReadOnlyUnbackedObservableList across files
+        "--add-exports", "javafx.controls/com.sun.javafx.scene.control=org.controlsfx.controls",
+        // For InputMap used in behavior classes
+        "--add-exports", "javafx.controls/com.sun.javafx.scene.control.inputmap=org.controlsfx.controls",
+        // For EventHandlerManager in AutoCompletionBinding
+        "--add-exports", "javafx.base/com.sun.javafx.event=org.controlsfx.controls",
+        // For MappingChange, NonIterableChange across files
+        "--add-exports", "javafx.base/com.sun.javafx.collections=org.controlsfx.controls",
+        // For VersionInfo in VersionChecker
+        "--add-exports", "javafx.base/com.sun.javafx.runtime=org.controlsfx.controls"]
 
 repositories {
     mavenCentral()

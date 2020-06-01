@@ -322,6 +322,10 @@ public class VaultController extends ChildController {
                 folderSelectorComboBox.setValue(folderSelectionOptions[0]);
             }
         }
+        // refresh folders in notification pane as well
+        if (Objects.nonNull(notificationPaneController)) {
+            notificationPaneController.refreshFolders();
+        }
     }
 
     public void addSelectedGifsToFolder(GifFolder folder) {

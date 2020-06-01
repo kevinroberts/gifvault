@@ -45,6 +45,19 @@ public class NotificationPaneController implements Initializable {
         this.vaultController.addSelectedGifsToFolder(selectedFolder);
     }
 
+    public void refreshFolders() {
+        GifFolder selectedFolder = folderChooserComboBox.getValue();
+        List<GifFolder> gifFolders = DatabaseHelper.getListOfFolders(50, 0, false);
+        folderSelectionOptions = gifFolders.toArray(new GifFolder[0]);
+        folderChooserComboBox.setItems(FXCollections
+                    .observableArrayList(folderSelectionOptions));
+        if (folderChooserComboBox.getItems().contains(selectedFolder)) {
+                folderChooserComboBox.setValue(selectedFolder);
+        } else {
+                folderChooserComboBox.setValue(folderSelectionOptions[0]);
+        }
+    }
+
     public void setVaultController(final VaultController vaultController) {
         this.vaultController = vaultController;
     }

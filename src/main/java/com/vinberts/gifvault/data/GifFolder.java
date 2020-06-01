@@ -38,7 +38,7 @@ public class GifFolder implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdAt;
 
-    @OneToMany(mappedBy = "folder", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "folder", fetch = FetchType.EAGER)
     private Collection<GifVault> gifVaultEntries;
 
     @Override
