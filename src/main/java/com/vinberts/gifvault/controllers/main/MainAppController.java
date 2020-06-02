@@ -112,8 +112,8 @@ public class MainAppController {
                                 MainAppController.class.getResource("/ui/vaultPane.fxml"));
                         if (prevTabSelected.equals("giphyTab")) {
                             log.info("Prev tab was Giphy Tab, releasing all its resources");
-                            GiphyController giphyController = (GiphyController) tabControllerMap.get(prevTabSelected);
-                            giphyController.releaseAllPlayers();
+                            //GiphyController giphyController = (GiphyController) tabControllerMap.get(prevTabSelected);
+                            //giphyController.releaseAllPlayers();
                         }
                         break;
                     default:

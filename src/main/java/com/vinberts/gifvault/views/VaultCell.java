@@ -6,24 +6,25 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.CheckBox;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.scene.text.Text;
+import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.HyperlinkLabel;
-import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
-import uk.co.caprica.vlcj.player.base.MediaPlayer;
-import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
-import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 import static de.jensd.fx.glyphs.GlyphsDude.createIcon;
-import static uk.co.caprica.vlcj.javafx.videosurface.ImageViewVideoSurfaceFactory.videoSurfaceForImageView;
 
 /**
  *
@@ -31,9 +32,6 @@ import static uk.co.caprica.vlcj.javafx.videosurface.ImageViewVideoSurfaceFactor
 @Slf4j
 public class VaultCell extends VBox {
 
-    private final MediaPlayerFactory mediaPlayerFactory;
-    private final EmbeddedMediaPlayer embeddedMediaPlayer;
-    private ImageView videoImageView;
     private Pane pane;
     private BorderPane borderPane;
     private HyperlinkLabel label;
@@ -41,34 +39,34 @@ public class VaultCell extends VBox {
     private GifVault gifVault;
     private CheckBox selectionBox;
     private HBox controlsContainer;
+    private Media media;
+    private MediaPlayer player;
+    private MediaView view;
     private final int maxTitleLen = 42;
 
     public VaultCell(final GifVault gifSource, String mp4Path) {
         super();
         this.gifVault = gifSource;
-        this.mediaPlayerFactory = new MediaPlayerFactory();
-        this.embeddedMediaPlayer = mediaPlayerFactory.mediaPlayers().newEmbeddedMediaPlayer();
-        this.embeddedMediaPlayer.events().addMediaPlayerEventListener(new MediaPlayerEventAdapter() {
-            @Override
-            public void playing(final MediaPlayer mediaPlayer) {
-                super.playing(mediaPlayer);
-            }
 
-            @Override
-            public void error(final MediaPlayer mediaPlayer) {
-                super.error(mediaPlayer);
-                log.error("Video playback error occurred");
-            }
-        });
-        this.embeddedMediaPlayer.controls().setRepeat(true);
-        this.videoImageView = new ImageView();
-        this.videoImageView.setPreserveRatio(true);
-        embeddedMediaPlayer.videoSurface().set(videoSurfaceForImageView(this.videoImageView));
-        videoImageView.setFitWidth(300);
-        videoImageView.setFitHeight(200);
+        URL urlSource = null;
+        try {
+            urlSource = Paths.get(mp4Path).toUri().toURL();
+            media = new Media(urlSource.toString());
+            media.setOnError(() -> {
+                // Handle asynchronous error in Media object.
+                log.error("Handle asynchronous error in Media object");
+            });
+            player = new MediaPlayer(media);
+            view = new MediaView(player);
+            view.setPreserveRatio(true);
+            view.setFitWidth(300);
+            view.setFitHeight(200);
+        } catch (MalformedURLException e) {
+            log.error("Invalid url for mp4 path: ", e);
+        }
 
         pane = new Pane();
-        pane.getChildren().add(videoImageView);
+        pane.getChildren().add(view);
         pane.setMaxWidth(300);
         pane.setMaxHeight(250);
         // set background color of video player to black
@@ -98,8 +96,13 @@ public class VaultCell extends VBox {
         BorderPane.setMargin(label, new Insets(0,5,0,0));
 
         Platform.runLater(() -> {
-            log.debug("Video playing.");
-            embeddedMediaPlayer.media().play(mp4Path);
+            log.info("Video playing.");
+            player.play();
+        });
+
+        player.setOnEndOfMedia(() -> {
+            player.seek(Duration.ZERO);
+            player.play();
         });
         this.setSpacing(5);
         this.getChildren().add(pane);
@@ -107,8 +110,7 @@ public class VaultCell extends VBox {
     }
 
     public void releasePlayer() {
-        this.mediaPlayerFactory.release();
-        this.embeddedMediaPlayer.release();
+       this.player.dispose();
     }
 
     public GifVault getGifVault() {
