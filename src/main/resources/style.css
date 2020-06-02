@@ -90,6 +90,10 @@
     -fx-underline: true;
 }
 
+.anchor {
+    -fx-cursor: hand;
+}
+
 .folder-selector {
     -fx-text-fill: -fx-primarytext;
     -jfx-focus-color: #33ffff;

@@ -151,8 +151,10 @@ public class GiphyController extends ChildController {
         giphyPane.addEventHandler(FavoritedEvent.UNFAVORITED, event -> {
             log.info("Un-favorite event handled for gif vault item");
             ObservableList<GiphyCell> gridItems = gridView.getItems();
-            gridItems.removeIf(cell -> cell.getGiphyData().getId().equals(event.getGifVault().getGiphyGif().getId()));
-            gridView.setItems(gridItems);
+            if (Objects.nonNull(event.getGifVault().getGiphyGif())) {
+                gridItems.removeIf(cell -> cell.getGiphyData().getId().equals(event.getGifVault().getGiphyGif().getId()));
+                gridView.setItems(gridItems);
+            }
         });
     }
 

@@ -2,10 +2,14 @@ package com.vinberts.gifvault.views;
 
 import com.jfoenix.controls.JFXButton;
 import com.vinberts.gifvault.data.GifVault;
+import com.vinberts.gifvault.events.DeleteVaultEvent;
+import com.vinberts.gifvault.events.SelectedVaultEvent;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
@@ -17,9 +21,11 @@ import javafx.scene.text.Text;
 import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.controlsfx.control.HyperlinkLabel;
 
+import java.awt.*;
+import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -34,7 +40,7 @@ public class VaultCell extends VBox {
 
     private Pane pane;
     private BorderPane borderPane;
-    private HyperlinkLabel label;
+    private Label label;
     private JFXButton removeButton;
     private GifVault gifVault;
     private CheckBox selectionBox;
@@ -48,7 +54,7 @@ public class VaultCell extends VBox {
         super();
         this.gifVault = gifSource;
 
-        URL urlSource = null;
+        URL urlSource;
         try {
             urlSource = Paths.get(mp4Path).toUri().toURL();
             media = new Media(urlSource.toString());
@@ -72,10 +78,22 @@ public class VaultCell extends VBox {
         // set background color of video player to black
         pane.setStyle("-fx-background-color: black;");
 
-        this.label = new HyperlinkLabel(String.format("[%s]",
+        this.label = new Label(String.format("%s",
                 StringUtils.abbreviate(gifVault.getTitle(), maxTitleLen)));
         if (Objects.nonNull(gifVault.getGiphyGif())) {
             this.label.setAccessibleText(gifVault.getGiphyGif().getBitlyUrl());
+            label.setOnMouseClicked(event -> {
+                log.info("Anchor link clicked");
+                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
+                    try {
+                        URI url = URI.create(gifVault.getGiphyGif().getBitlyUrl());
+                        Desktop.getDesktop().browse(url);
+                    } catch (IOException ex) {
+                        log.error("IOException occurred", ex);
+                    }
+                }
+            });
+            this.label.getStyleClass().add("anchor");
         }
 
         this.removeButton = new JFXButton();
@@ -83,7 +101,26 @@ public class VaultCell extends VBox {
                 createIcon(FontAwesomeIcon.TRASH, "10pt");
         removeButton.setGraphic(trashIcon);
 
+        removeButton.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
+            log.debug("Remove button clicked");
+            DeleteVaultEvent deleteVaultEvent = new DeleteVaultEvent(removeButton, removeButton, DeleteVaultEvent.DELETED, this);
+            this.fireEvent(deleteVaultEvent);
+        });
+
         selectionBox = new CheckBox(" ");
+
+        selectionBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue) {
+                log.debug("Checkbox Selected");
+                SelectedVaultEvent selectedVaultEvent = new SelectedVaultEvent(selectionBox, selectionBox, SelectedVaultEvent.SELECTED, this);
+                this.fireEvent(selectedVaultEvent);
+            } else {
+                log.debug("Checkbox unselected");
+                SelectedVaultEvent vaultEvent = new SelectedVaultEvent(selectionBox, selectionBox, SelectedVaultEvent.UNSELECTED, this);
+                this.fireEvent(vaultEvent);
+            }
+        });
+
         borderPane = new BorderPane();
         controlsContainer = new HBox();
         controlsContainer.getChildren().add(selectionBox);

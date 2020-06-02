@@ -8,7 +8,9 @@ import com.vinberts.gifvault.data.GifFolder;
 import com.vinberts.gifvault.data.GifVault;
 import com.vinberts.gifvault.database.DatabaseHelper;
 import com.vinberts.gifvault.events.CustomCloseEvent;
+import com.vinberts.gifvault.events.DeleteVaultEvent;
 import com.vinberts.gifvault.events.FavoritedEvent;
+import com.vinberts.gifvault.events.SelectedVaultEvent;
 import com.vinberts.gifvault.utils.AlertMaker;
 import com.vinberts.gifvault.utils.AppUtils;
 import com.vinberts.gifvault.views.VaultCell;
@@ -22,6 +24,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -32,15 +36,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import static com.vinberts.gifvault.utils.AppConstants.UNCATEGORIZED;
@@ -152,7 +155,11 @@ public class VaultController extends ChildController {
             gridView.setItems(gridItems);
         });
 
-        gridView.addEventFilter(MouseEvent.MOUSE_RELEASED, this::handleGridActionEvent);
+        gridView.addEventFilter(MouseEvent.MOUSE_RELEASED, this::handleGridCellEvent);
+        gridView.addEventFilter(SelectedVaultEvent.SELECTED, this::handleSelectedEvent);
+        gridView.addEventFilter(SelectedVaultEvent.UNSELECTED, this::handleUnselectedEvent);
+        gridView.addEventFilter(DeleteVaultEvent.DELETED, this::handleDeleteVaultEvent);
+
 
         // load the initial folder uncategorized
         Platform.runLater(() -> {
@@ -174,60 +181,69 @@ public class VaultController extends ChildController {
 
     }
 
-    private void handleGridActionEvent(MouseEvent event) {
+    private void handleGridCellEvent(MouseEvent event) {
         EventTarget comp = event.getTarget();
         Node node = event.getPickResult().getIntersectedNode();
         if (comp instanceof GridCell) {
-            log.debug("Grid cell clicked");
+            log.info("mouse released " + node);
             GridCell gridCell = ((GridCell) comp);
             VaultCell cell = (VaultCell) gridCell.getGraphic();
-            if (node instanceof Text) {
-                String anchorLink = cell.getAnchorLink();
-                if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
-                    try {
-                        URI url = URI.create(anchorLink);
-                        Desktop.getDesktop().browse(url);
-                    } catch (IOException ex) {
-                        log.error("IOException occurred", ex);
-                    }
-                }
-            } else if (node instanceof JFXButton) {
-                log.debug("removing gif from favorites");
-                FavoritedEvent unFaveEvent = new FavoritedEvent(cell,
-                        this.getMainAppController().getGiphyTab().getContent(),
-                        FavoritedEvent.UNFAVORITED, cell.getGifVault());
-                if (Objects.nonNull(cell.getGifVault().getGiphyGif())) {
-                    DatabaseHelper.deleteGiphyGifById(cell.getGifVault().getGiphyGif().getId(), false);
-                }
-                // remove associated files from gif vault / filesystem
-                AppUtils.removeAssetsFromFileSystem(cell.getGifVault());
-                DatabaseHelper.deleteGifVaultById(cell.getGifVault().getId());
-                // remove item from Grid View UI
-                ObservableList<VaultCell> gridItems = gridView.getItems();
-                gridItems.removeIf(vaultCell -> vaultCell.getGifVault().getId().equals(cell.getGifVault().getId()));
-                gridView.setItems(gridItems);
-                this.getMainAppController().getGiphyTab().getContent().fireEvent(unFaveEvent);
-            } else if (node instanceof StackPane) {
+            if (node instanceof StackPane) {
                 log.debug("handling checkbox action from grid list");
                 if (cell.getSelectionBox().isSelected()) {
                     cell.getSelectionBox().setSelected(false);
-                    if (numberOfVaultsSelected > 0) {
-                        numberOfVaultsSelected--;
-                    }
-                    if (numberOfVaultsSelected == 0) {
-                        this.getMainAppController().getNotificationsPane().hide();
-                    }
                 } else {
                     cell.getSelectionBox().setSelected(true);
-                    numberOfVaultsSelected++;
-                    notificationPaneController.updateInfoText(String.format("Add %d Selected Gifs to Folder:", numberOfVaultsSelected));
-                    this.getMainAppController().getNotificationsPane().show();
                 }
-
             }
         }
     }
 
+    private void handleSelectedEvent(SelectedVaultEvent event) {
+        log.debug("Handling selected added event");
+        numberOfVaultsSelected++;
+        notificationPaneController.updateInfoText(String.format("Add %d Selected Gifs to Folder:", numberOfVaultsSelected));
+        this.getMainAppController().getNotificationsPane().show();
+    }
+
+    private void handleUnselectedEvent(SelectedVaultEvent event) {
+        if (numberOfVaultsSelected >= 0) {
+            numberOfVaultsSelected--;
+            notificationPaneController.updateInfoText(String.format("Add %d Selected Gifs to Folder:", numberOfVaultsSelected));
+            if (numberOfVaultsSelected == 0) {
+                this.getMainAppController().getNotificationsPane().hide();
+            }
+        }
+    }
+
+    private void handleDeleteVaultEvent(DeleteVaultEvent event) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Are you sure?");
+        String s = "Confirm to remove this gif? This action cannot be undone.";
+        alert.setContentText(s);
+        Optional<ButtonType> result = alert.showAndWait();
+        if ((result.isPresent()) && (result.get() == ButtonType.OK)) {
+            log.debug("removing gif from favorites");
+            FavoritedEvent unFaveEvent = new FavoritedEvent(event.getVaultCell(),
+                    this.getMainAppController().getGiphyTab().getContent(),
+                    FavoritedEvent.UNFAVORITED, event.getVaultCell().getGifVault());
+            if (Objects.nonNull(event.getVaultCell().getGifVault().getGiphyGif())) {
+                DatabaseHelper.deleteGiphyGifById(event.getVaultCell().getGifVault().getGiphyGif().getId(), false);
+            }
+            // remove associated files from gif vault / filesystem
+            AppUtils.removeAssetsFromFileSystem(event.getVaultCell().getGifVault());
+            DatabaseHelper.deleteGifVaultById(event.getVaultCell().getGifVault().getId());
+            // remove item from Grid View UI
+            ObservableList<VaultCell> gridItems = gridView.getItems();
+            gridItems.removeIf(vaultCell -> vaultCell.getGifVault().getId().equals(event.getVaultCell().getGifVault().getId()));
+            Platform.runLater(() -> {
+                gridView.setItems(gridItems);
+            });
+            this.getMainAppController().getGiphyTab().getContent().fireEvent(unFaveEvent);
+        } else {
+            log.debug("user canceled");
+        }
+    }
 
     public void doFilterAction(final ActionEvent actionEvent) {
         log.debug("starting do filter action");
