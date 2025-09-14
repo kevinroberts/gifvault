@@ -5,6 +5,7 @@ import com.vinberts.gifvault.data.GifVault;
 import com.vinberts.gifvault.events.DeleteVaultEvent;
 import com.vinberts.gifvault.events.SelectedVaultEvent;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.control.CheckBox;
@@ -19,7 +20,6 @@ import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.scene.text.Text;
 import javafx.util.Duration;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
@@ -30,13 +30,12 @@ import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import static de.jensd.fx.glyphs.GlyphsDude.createIcon;
 
 /**
  *
  */
-@Slf4j
 public class VaultCell extends VBox {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(VaultCell.class);
 
     private Pane pane;
     private BorderPane borderPane;
@@ -98,7 +97,7 @@ public class VaultCell extends VBox {
 
         this.removeButton = new JFXButton();
         Text trashIcon =
-                createIcon(FontAwesomeIcon.TRASH, "10pt");
+                FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.TRASH, "10pt");
         removeButton.setGraphic(trashIcon);
 
         removeButton.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {

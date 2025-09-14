@@ -17,7 +17,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,12 +30,12 @@ import static com.vinberts.gifvault.utils.AppConstants.UNCATEGORIZED;
 /**
  *
  */
-@Slf4j
 public class TextFieldTreeCellImpl extends TreeCell<GifFolder> {
     private TextField textField;
     private final ContextMenu addFolderMenu = new ContextMenu();
     private final ContextMenu removeFolderMenu = new ContextMenu();
     private final Image folderIcon = new Image(TextFieldTreeCellImpl.class.getResourceAsStream("/folder.png"));
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(TextFieldTreeCellImpl.class);
 
     public TextFieldTreeCellImpl() {
         MenuItem addMenuItem = new MenuItem("Add Folder");

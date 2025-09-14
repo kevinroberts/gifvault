@@ -1,8 +1,5 @@
 package com.vinberts.gifvault.data;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -22,11 +19,18 @@ import java.util.Date;
  *
  */
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "GIF_FOLDER")
 public class GifFolder implements Serializable {
+
+    public GifFolder() {
+    }
+
+    public GifFolder(String id, String name, Date createdAt, Collection<GifVault> gifVaultEntries) {
+        this.id = id;
+        this.name = name;
+        this.createdAt = createdAt;
+        this.gifVaultEntries = gifVaultEntries;
+    }
 
     @Id
     private String id;
@@ -64,5 +68,37 @@ public class GifFolder implements Serializable {
         return new HashCodeBuilder(17, 37)
                 .append(name)
                 .toHashCode();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Collection<GifVault> getGifVaultEntries() {
+        return gifVaultEntries;
+    }
+
+    public void setGifVaultEntries(Collection<GifVault> gifVaultEntries) {
+        this.gifVaultEntries = gifVaultEntries;
     }
 }

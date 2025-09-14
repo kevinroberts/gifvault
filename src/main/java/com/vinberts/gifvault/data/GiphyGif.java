@@ -1,8 +1,5 @@
 package com.vinberts.gifvault.data;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -22,11 +19,28 @@ import java.util.Date;
  *
  */
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "GIPHY_GIFS")
 public class GiphyGif {
+
+    public GiphyGif() {
+    }
+
+    public GiphyGif(String id, GifVault gifVaultEntry, String url, String bitlyUrl, String embedUrl, String username, String giphyTitle, String rating, boolean isSticker, String originalMp4, String originalUrl, String fixedHeightMp4, String fixedHeightUrl, Date importedAt) {
+        this.id = id;
+        this.gifVaultEntry = gifVaultEntry;
+        this.url = url;
+        this.bitlyUrl = bitlyUrl;
+        this.embedUrl = embedUrl;
+        this.username = username;
+        this.giphyTitle = giphyTitle;
+        this.rating = rating;
+        this.isSticker = isSticker;
+        this.originalMp4 = originalMp4;
+        this.originalUrl = originalUrl;
+        this.fixedHeightMp4 = fixedHeightMp4;
+        this.fixedHeightUrl = fixedHeightUrl;
+        this.importedAt = importedAt;
+    }
 
     @Id
     @Column(name = "id")
@@ -95,5 +109,117 @@ public class GiphyGif {
         return new HashCodeBuilder(17, 37)
                 .append(id)
                 .toHashCode();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public GifVault getGifVaultEntry() {
+        return gifVaultEntry;
+    }
+
+    public void setGifVaultEntry(GifVault gifVaultEntry) {
+        this.gifVaultEntry = gifVaultEntry;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public String getBitlyUrl() {
+        return bitlyUrl;
+    }
+
+    public void setBitlyUrl(String bitlyUrl) {
+        this.bitlyUrl = bitlyUrl;
+    }
+
+    public String getEmbedUrl() {
+        return embedUrl;
+    }
+
+    public void setEmbedUrl(String embedUrl) {
+        this.embedUrl = embedUrl;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getGiphyTitle() {
+        return giphyTitle;
+    }
+
+    public void setGiphyTitle(String giphyTitle) {
+        this.giphyTitle = giphyTitle;
+    }
+
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
+    }
+
+    public boolean isSticker() {
+        return isSticker;
+    }
+
+    public void setSticker(boolean sticker) {
+        isSticker = sticker;
+    }
+
+    public String getOriginalMp4() {
+        return originalMp4;
+    }
+
+    public void setOriginalMp4(String originalMp4) {
+        this.originalMp4 = originalMp4;
+    }
+
+    public String getOriginalUrl() {
+        return originalUrl;
+    }
+
+    public void setOriginalUrl(String originalUrl) {
+        this.originalUrl = originalUrl;
+    }
+
+    public String getFixedHeightMp4() {
+        return fixedHeightMp4;
+    }
+
+    public void setFixedHeightMp4(String fixedHeightMp4) {
+        this.fixedHeightMp4 = fixedHeightMp4;
+    }
+
+    public String getFixedHeightUrl() {
+        return fixedHeightUrl;
+    }
+
+    public void setFixedHeightUrl(String fixedHeightUrl) {
+        this.fixedHeightUrl = fixedHeightUrl;
+    }
+
+    public Date getImportedAt() {
+        return importedAt;
+    }
+
+    public void setImportedAt(Date importedAt) {
+        this.importedAt = importedAt;
     }
 }

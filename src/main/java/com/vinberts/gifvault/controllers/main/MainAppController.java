@@ -23,7 +23,6 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.text.TextAlignment;
-import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.NotificationPane;
 
 import java.io.IOException;
@@ -35,9 +34,9 @@ import java.util.Objects;
 /**
  *
  */
-@Slf4j
 public class MainAppController {
 
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MainAppController.class);
     private NotificationPane notificationsPane;
 
     @FXML

@@ -1,6 +1,5 @@
 package com.vinberts.gifvault.utils;
 
-import com.roxstudio.utils.CUrl;
 import com.trievosoftware.giphy4j.entity.giphy.GiphyContainer;
 import com.trievosoftware.giphy4j.entity.giphy.GiphyData;
 import com.trievosoftware.giphy4j.entity.giphy.GiphyImage;
@@ -21,29 +20,29 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 /**
  *
  */
-@Slf4j
 public class AppUtils {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(AppUtils.class);
     public static final String ICON_IMAGE_LOC = "lock.png";
     private static final SimpleDateFormat DATE_TIME_FORMAT = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss a");
 
@@ -189,12 +188,25 @@ public class AppUtils {
             Files.createDirectory(containerPath);
         }
         new Thread(() -> {
-            String mp4FilePath = containerPath.toString() + File.separator + gifVault.getMp4Filename();
-            CUrl cUrl = new CUrl(mp4URL).output(mp4FilePath).timeout(10, 130);
-            cUrl.exec();
-            String gifFilePath = containerPath.toString() + File.separator + gifVault.getGifFilename();
-            CUrl cUrl2 = new CUrl(gifUrl).output(gifFilePath).timeout(10, 130);
-            cUrl2.exec();
+            String mp4FilePath = null;
+            try {
+                mp4FilePath = containerPath.toString() + File.separator + gifVault.getMp4Filename();
+                HttpClient httpClient = HttpClient.newHttpClient();
+                HttpRequest mp4Request = HttpRequest.newBuilder()
+                        .uri(URI.create(mp4URL))
+                        .timeout(Duration.ofSeconds(130))
+                        .build();
+                httpClient.send(mp4Request, HttpResponse.BodyHandlers.ofFile(Paths.get(mp4FilePath)));
+
+                String gifFilePath = containerPath.toString() + File.separator + gifVault.getGifFilename();
+                HttpRequest gifRequest = HttpRequest.newBuilder()
+                        .uri(URI.create(gifUrl))
+                        .timeout(Duration.ofSeconds(130))
+                        .build();
+                httpClient.send(gifRequest, HttpResponse.BodyHandlers.ofFile(Paths.get(gifFilePath)));
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
             if (Objects.nonNull(tab.getContent())) {
                 Platform.runLater(()-> {
                     tab.getContent().fireEvent(event);

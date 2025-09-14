@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-11.0.2.jdk/Contents/Home
+JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-24.jdk/Contents/Home
 #
 # Copyright 2015 the original author or authors.
 #

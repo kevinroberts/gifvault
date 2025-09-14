@@ -1,8 +1,5 @@
 package com.vinberts.gifvault.data;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -23,11 +20,23 @@ import java.util.Date;
  *
  */
 @Entity
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "GIF_VAULT")
 public class GifVault {
+
+    public GifVault() {
+    }
+
+    public GifVault(String id, GifFolder folder, String title, String storageLocation, String mp4Filename, String gifFilename, Date createdAt, Date updatedAt, GiphyGif giphyGif) {
+        this.id = id;
+        this.folder = folder;
+        this.title = title;
+        this.storageLocation = storageLocation;
+        this.mp4Filename = mp4Filename;
+        this.gifFilename = gifFilename;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.giphyGif = giphyGif;
+    }
 
     @Id
     @Column(name = "id")
@@ -91,5 +100,77 @@ public class GifVault {
         return new HashCodeBuilder(17, 37)
                 .append(id)
                 .toHashCode();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public GifFolder getFolder() {
+        return folder;
+    }
+
+    public void setFolder(GifFolder folder) {
+        this.folder = folder;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getStorageLocation() {
+        return storageLocation;
+    }
+
+    public void setStorageLocation(String storageLocation) {
+        this.storageLocation = storageLocation;
+    }
+
+    public String getMp4Filename() {
+        return mp4Filename;
+    }
+
+    public void setMp4Filename(String mp4Filename) {
+        this.mp4Filename = mp4Filename;
+    }
+
+    public String getGifFilename() {
+        return gifFilename;
+    }
+
+    public void setGifFilename(String gifFilename) {
+        this.gifFilename = gifFilename;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Date updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public GiphyGif getGiphyGif() {
+        return giphyGif;
+    }
+
+    public void setGiphyGif(GiphyGif giphyGif) {
+        this.giphyGif = giphyGif;
     }
 }

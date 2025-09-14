@@ -10,7 +10,6 @@ module gifvault {
     requires javafx.web;
     requires java.desktop;
     requires java.sql;
-    requires fontawesomefx;
     requires com.jfoenix;
     requires org.controlsfx.controls;
     requires uk.co.caprica.vlcj;
@@ -24,18 +23,19 @@ module gifvault {
     requires com.sun.xml.bind;
     requires net.bytebuddy;
     requires org.hibernate.orm.core;
-    requires gson;
     requires org.apache.commons.io;
-    requires java.curl;
-    requires static lombok;
-    requires giphy4j;
+    requires javafx.swing;
+    requires de.jensd.fx.glyphs.fontawesome;
+    requires java.net.http;
+    requires com.trievosoftware.giphy4j;
+    requires com.google.gson;
 
     opens com.vinberts.gifvault to javafx.fxml;
     opens com.vinberts.gifvault.controllers.gihpy to javafx.fxml;
     opens com.vinberts.gifvault.controllers.main to javafx.fxml;
     opens com.vinberts.gifvault.controllers.vault to javafx.fxml;
     opens com.vinberts.gifvault.controllers.about to javafx.fxml;
-    opens com.vinberts.gifvault.controllers.settings to javafx.fxml;
+    opens com.vinberts.gifvault.controllers.settings to javafx.fxml, com.google.gson;
     opens com.vinberts.gifvault.controllers.folders to javafx.fxml;
     opens com.vinberts.gifvault.data to org.hibernate.orm.core;
     exports com.vinberts.gifvault;

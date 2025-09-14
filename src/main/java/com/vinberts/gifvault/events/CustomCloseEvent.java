@@ -3,15 +3,14 @@ package com.vinberts.gifvault.events;
 import com.vinberts.gifvault.controllers.vault.VaultController;
 import javafx.event.EventHandler;
 import javafx.stage.WindowEvent;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  *
  */
-@Slf4j
 public class CustomCloseEvent implements EventHandler<WindowEvent> {
 
     VaultController vaultController;
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CustomCloseEvent.class);
 
     @Override
     public void handle(final WindowEvent event) {

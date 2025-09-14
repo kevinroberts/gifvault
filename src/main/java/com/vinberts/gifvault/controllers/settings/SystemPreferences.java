@@ -3,16 +3,10 @@ package com.vinberts.gifvault.controllers.settings;
 import com.google.gson.Gson;
 import com.vinberts.gifvault.utils.AlertMaker;
 import com.vinberts.gifvault.utils.SystemPropertyLoader;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -24,11 +18,11 @@ import static com.vinberts.gifvault.utils.AppConstants.GIPHY_API_KEY_PROP;
 /**
  *
  */
-@Slf4j
 public class SystemPreferences {
     private static final String CONFIG_FILE = "config.json";
     private String gifVaultFolderLocation;
     private String giphyAPIKey;
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SystemPreferences.class);
 
     public SystemPreferences() {
         SystemPropertyLoader.loadPropValues();
@@ -41,7 +35,7 @@ public class SystemPreferences {
                     Files.createDirectory(fallbackVaultPath);
                     System.setProperty(GIF_VAULT_FOLDER_LOC_PROP, fallbackVaultPath.toString());
                 } catch (IOException e) {
-                    log.error("Could not create Gif Vault folder location at " + fallbackVaultPath.toString(), e);
+                    log.error("Could not create Gif Vault folder location at {}", fallbackVaultPath.toString(), e);
                     System.exit(1);
                 }
             }

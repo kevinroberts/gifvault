@@ -6,7 +6,6 @@ import com.vinberts.gifvault.data.GifVault;
 import com.vinberts.gifvault.data.GiphyGif;
 import com.vinberts.gifvault.utils.AppUtils;
 import com.vinberts.gifvault.views.GiphyCell;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.HibernateException;
 import org.hibernate.IdentifierLoadAccess;
@@ -16,13 +15,7 @@ import org.hibernate.query.Query;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static com.vinberts.gifvault.utils.AppConstants.GIPHY_DATE_FORMAT;
 import static com.vinberts.gifvault.utils.AppConstants.UNCATEGORIZED;
@@ -30,8 +23,8 @@ import static com.vinberts.gifvault.utils.AppConstants.UNCATEGORIZED;
 /**
  *
  */
-@Slf4j
 public class DatabaseHelper {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(DatabaseHelper.class);
 
     public static boolean insertNewGifFolder(GifFolder folder) {
         Transaction transaction = null;

@@ -7,18 +7,17 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  *
  */
-@Slf4j
 public class GiphyCellVideo extends VBox {
 
     Media media;
     MediaPlayer player;
     MediaView view;
     Pane pane;
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GiphyCellVideo.class);
 
     public GiphyCellVideo(final String gifSource) {
         super();

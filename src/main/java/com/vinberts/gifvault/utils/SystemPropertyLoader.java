@@ -1,6 +1,5 @@
 package com.vinberts.gifvault.utils;
 
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.FileNotFoundException;
@@ -15,8 +14,8 @@ import static com.vinberts.gifvault.utils.AppConstants.GIPHY_API_KEY_PROP;
 /**
  *
  */
-@Slf4j
 public class SystemPropertyLoader {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SystemPropertyLoader.class);
 
     public static void loadPropValues() {
         InputStream inputStream = null;

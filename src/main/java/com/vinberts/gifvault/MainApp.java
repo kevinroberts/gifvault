@@ -7,17 +7,17 @@ import com.vinberts.gifvault.database.HibernateUtil;
 import com.vinberts.gifvault.utils.AppUtils;
 import com.vinberts.gifvault.utils.SystemPropertyLoader;
 import javafx.application.Application;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.Window;
 import javafx.stage.WindowEvent;
-import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.NotificationPane;
 
-import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.time.Duration;
@@ -26,10 +26,10 @@ import java.time.temporal.ChronoUnit;
 /**
  *
  */
-@Slf4j
 public class MainApp extends Application {
 
     private static final Long startTime = System.currentTimeMillis();
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MainApp.class);
 
     @Override
     public void start(Stage primaryStage) throws IOException {
@@ -40,8 +40,9 @@ public class MainApp extends Application {
 
         try {
             URL iconURL = MainApp.class.getResource("/gifVaultDock.png");
-            Image image = new ImageIcon(iconURL).getImage();
-            Taskbar.getTaskbar().setIconImage(image);
+            javafx.scene.image.Image fxImage = new javafx.scene.image.Image(iconURL.toExternalForm());
+            BufferedImage awtImage = SwingFXUtils.fromFXImage(fxImage, null);
+            Taskbar.getTaskbar().setIconImage(awtImage);
         } catch (Exception e) {
             log.error("Could not set APP icon", e);
         }
@@ -103,8 +104,13 @@ public class MainApp extends Application {
     }
 
     public static void main(String[] args) {
+        System.setProperty("java.awt.headless", "false");
+        // Eagerly initialize AWT Toolkit to work around a macOS-specific issue
+        // where AWT must be initialized on the main thread before JavaFX starts.
+        java.awt.Toolkit.getDefaultToolkit();
         log.info("Starting main application on {}", AppUtils.formatDateTimeString(startTime));
         launch(args);
     }
+
 
 }

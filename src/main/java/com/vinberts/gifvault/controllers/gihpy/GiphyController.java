@@ -18,6 +18,7 @@ import com.vinberts.gifvault.utils.AlertMaker;
 import com.vinberts.gifvault.utils.AppUtils;
 import com.vinberts.gifvault.views.GiphyCell;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -30,7 +31,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.text.Text;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
@@ -43,19 +43,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import static com.vinberts.gifvault.utils.AppConstants.ALL_GIFS;
-import static com.vinberts.gifvault.utils.AppConstants.ALL_STICKERS;
-import static com.vinberts.gifvault.utils.AppConstants.FAVED_TEXT;
-import static com.vinberts.gifvault.utils.AppConstants.GIPHY_API_KEY_PROP;
-import static com.vinberts.gifvault.utils.AppConstants.HEARTED_CLASS;
-import static com.vinberts.gifvault.utils.AppConstants.UNFAVED_TEXT;
+import static com.vinberts.gifvault.utils.AppConstants.*;
 import static com.vinberts.gifvault.utils.AppUtils.setTimeout;
-import static de.jensd.fx.glyphs.GlyphsDude.createIcon;
 
 /**
  *
  */
-@Slf4j
 public class GiphyController extends ChildController {
 
     @FXML
@@ -97,7 +90,7 @@ public class GiphyController extends ChildController {
                 .observableArrayList(giphySearchOptions));
         giphyComboBox.setValue(giphySearchOptions[0]);
         Text icon =
-                createIcon(FontAwesomeIcon.SEARCH, "14pt");
+                FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.SEARCH, "14pt");
         searchButton.setGraphic(icon);
         // set search action to perform when user hit Enter key
         searchGiphyTextField.setOnKeyPressed(event -> {
@@ -189,7 +182,7 @@ public class GiphyController extends ChildController {
                     } else {
                         FavoritedEvent favoritedEvent = new FavoritedEvent(cell, this.getMainAppController().getVaultTab().getContent(), FavoritedEvent.FAVORITED, gifVault);
                         Text heartIcon =
-                                createIcon(FontAwesomeIcon.HEART, "10pt");
+                                FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.HEART, "10pt");
                         ((JFXButton) node).setGraphic(heartIcon);
                         node.setAccessibleText(FAVED_TEXT);
                         node.getStyleClass().add(HEARTED_CLASS);
@@ -215,7 +208,7 @@ public class GiphyController extends ChildController {
                         this.getMainAppController().getVaultTab().getContent().fireEvent(unFaveEvent);
                         DatabaseHelper.deleteGifVaultById(vaultId);
                         Text heartIcon =
-                                createIcon(FontAwesomeIcon.HEART_ALT, "10pt");
+                                FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.HEART_ALT, "10pt");
                         ((JFXButton) node).setGraphic(heartIcon);
                         node.setAccessibleText(UNFAVED_TEXT);
                         node.getStyleClass().remove(HEARTED_CLASS);

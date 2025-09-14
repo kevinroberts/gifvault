@@ -8,7 +8,6 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import lombok.extern.slf4j.Slf4j;
 
 import java.net.URL;
 import java.util.List;
@@ -17,7 +16,6 @@ import java.util.ResourceBundle;
 /**
  *
  */
-@Slf4j
 public class NotificationPaneController implements Initializable {
 
     @FXML
@@ -29,6 +27,8 @@ public class NotificationPaneController implements Initializable {
     private GifFolder[] folderSelectionOptions;
 
     private VaultController vaultController;
+    private static final org.slf4j.Logger log =
+            org.slf4j.LoggerFactory.getLogger(NotificationPaneController.class);
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {

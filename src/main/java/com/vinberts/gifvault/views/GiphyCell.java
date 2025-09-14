@@ -3,6 +3,7 @@ package com.vinberts.gifvault.views;
 import com.jfoenix.controls.JFXButton;
 import com.trievosoftware.giphy4j.entity.giphy.GiphyData;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.image.ImageView;
@@ -10,24 +11,19 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.HyperlinkLabel;
 import uk.co.caprica.vlcj.factory.MediaPlayerFactory;
+import uk.co.caprica.vlcj.javafx.videosurface.ImageViewVideoSurface;
 import uk.co.caprica.vlcj.player.base.MediaPlayer;
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter;
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer;
 
-import static com.vinberts.gifvault.utils.AppConstants.FAVED_TEXT;
-import static com.vinberts.gifvault.utils.AppConstants.HEARTED_CLASS;
-import static com.vinberts.gifvault.utils.AppConstants.UNFAVED_TEXT;
-import static de.jensd.fx.glyphs.GlyphsDude.createIcon;
-import static uk.co.caprica.vlcj.javafx.videosurface.ImageViewVideoSurfaceFactory.videoSurfaceForImageView;
+import static com.vinberts.gifvault.utils.AppConstants.*;
 
 /**
  *
  */
-@Slf4j
 public class GiphyCell extends VBox {
 
     private final MediaPlayerFactory mediaPlayerFactory;
@@ -39,6 +35,7 @@ public class GiphyCell extends VBox {
     private JFXButton faveButton;
     private GiphyData giphyData;
     private final int maxTitleLen = 45;
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GiphyCell.class);
 
     public GiphyCell(final GiphyData gifSource, boolean isFaved) {
         super();
@@ -60,7 +57,7 @@ public class GiphyCell extends VBox {
         this.embeddedMediaPlayer.controls().setRepeat(true);
         this.videoImageView = new ImageView();
         this.videoImageView.setPreserveRatio(true);
-        embeddedMediaPlayer.videoSurface().set(videoSurfaceForImageView(this.videoImageView));
+        embeddedMediaPlayer.videoSurface().set(new ImageViewVideoSurface(this.videoImageView));
         videoImageView.setFitWidth(300);
         videoImageView.setFitHeight(200);
 
@@ -77,13 +74,13 @@ public class GiphyCell extends VBox {
         this.faveButton = new JFXButton();
         if (isFaved) {
             Text heartIcon =
-                    createIcon(FontAwesomeIcon.HEART, "10pt");
+                    FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.HEART, "10pt");
             faveButton.setGraphic(heartIcon);
             faveButton.getStyleClass().add(HEARTED_CLASS);
             faveButton.setAccessibleText(FAVED_TEXT);
         } else {
             Text icon =
-                    createIcon(FontAwesomeIcon.HEART_ALT, "10pt");
+                    FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.HEART_ALT, "10pt");
             faveButton.setGraphic(icon);
             faveButton.setAccessibleText(UNFAVED_TEXT);
         }

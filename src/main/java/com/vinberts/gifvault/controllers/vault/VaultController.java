@@ -14,7 +14,8 @@ import com.vinberts.gifvault.events.SelectedVaultEvent;
 import com.vinberts.gifvault.utils.AlertMaker;
 import com.vinberts.gifvault.utils.AppUtils;
 import com.vinberts.gifvault.views.VaultCell;
-import de.jensd.fx.glyphs.materialicons.MaterialIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -32,7 +33,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
-import lombok.extern.slf4j.Slf4j;
 import org.controlsfx.control.GridCell;
 import org.controlsfx.control.GridView;
 
@@ -47,12 +47,10 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 import static com.vinberts.gifvault.utils.AppConstants.UNCATEGORIZED;
-import static de.jensd.fx.glyphs.GlyphsDude.createIcon;
 
 /**
  *
  */
-@Slf4j
 public class VaultController extends ChildController {
 
     @FXML
@@ -87,6 +85,7 @@ public class VaultController extends ChildController {
     private int numberOfVaultsSelected = 0;
 
     SystemPreferences preferences;
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(VaultController.class);
 
     @Override
     public void initialize(final URL location, final ResourceBundle resources) {
@@ -97,7 +96,7 @@ public class VaultController extends ChildController {
                 .observableArrayList(folderSelectionOptions));
         folderSelectorComboBox.setValue(folderSelectionOptions[0]);
         Text icon =
-                createIcon(MaterialIcon.CREATE_NEW_FOLDER, "14pt");
+                FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.FOLDER, "14pt");
         manageFoldersButton.setGraphic(icon);
 
         // setup notifications bar
