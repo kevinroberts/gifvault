@@ -12,15 +12,7 @@ java {
         mainModule = "gifvault"
         mainClass = "com.vinberts.gifvault.MainApp"
         applicationDefaultJvmArgs = [
-                '--add-exports', 'javafx.controls/com.sun.javafx.scene.control.behavior=com.jfoenix',
-                '--add-exports', 'javafx.controls/com.sun.javafx.scene.control=com.jfoenix',
-                '--add-exports', 'javafx.base/com.sun.javafx.binding=com.jfoenix',
-                '--add-exports', 'javafx.graphics/com.sun.javafx.stage=com.jfoenix',
-                '--add-exports', 'javafx.graphics/com.sun.javafx.scene=com.jfoenix',
-                // Add this line to allow JFoenix to access skin internals
-                '--add-opens', 'javafx.controls/com.sun.javafx.scene.control.skin=com.jfoenix',
                 '--add-opens', 'javafx.controls/javafx.scene.control.skin=org.controlsfx.controls',
-                '--add-exports', 'javafx.base/com.sun.javafx.event=com.jfoenix',
                 // ControlsFX required exports
                 // For various usages of TraversalEngine
                 '--add-exports', 'javafx.graphics/com.sun.javafx.scene=org.controlsfx.controls',
@@ -44,9 +36,6 @@ java {
     }
 }
 
-
-
-
 repositories {
     mavenCentral()
     maven {
@@ -57,19 +46,14 @@ repositories {
     }
 }
 
-
-
 javafx {
     version = "21"
     modules = [ 'javafx.controls', 'javafx.fxml', 'javafx.media', 'javafx.web', 'javafx.swing' ]
 }
 
 dependencies {
-    // Replace the old JFoenix dependency with this snapshot from GitHub
-    implementation 'com.github.jfoenixadmin:JFoenix:master-SNAPSHOT'
-
     // https://mvnrepository.com/artifact/org.controlsfx/controlsfx
-    implementation (group: 'org.controlsfx', name: 'controlsfx', version: '11.0.1') {
+    implementation (group: 'org.controlsfx', name: 'controlsfx', version: '11.2.2') {
         exclude group: 'org.openjfx'
     }
     // VLC for JavaFx - use for displaying MP4s from Gif providers
@@ -103,6 +87,7 @@ dependencies {
     implementation group: 'org.slf4j', name: 'jul-to-slf4j', version: '1.7.25' // JUL bridge
     implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7.25' // Apache Commons Logging (JCL) bridge
     implementation group: 'org.slf4j', name: 'log4j-over-slf4j', version: '1.7.25' // log4j1.2 bridge
+    implementation("org.apache.commons:commons-lang3:3.18.0")
 
 }
 

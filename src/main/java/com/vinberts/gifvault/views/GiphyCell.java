@@ -1,11 +1,11 @@
 package com.vinberts.gifvault.views;
 
-import com.jfoenix.controls.JFXButton;
 import com.trievosoftware.giphy4j.entity.giphy.GiphyData;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -32,7 +32,7 @@ public class GiphyCell extends VBox {
     private Pane pane;
     private BorderPane borderPane;
     private HyperlinkLabel label;
-    private JFXButton faveButton;
+    private Button faveButton;
     private GiphyData giphyData;
     private final int maxTitleLen = 45;
     private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(GiphyCell.class);
@@ -69,9 +69,10 @@ public class GiphyCell extends VBox {
         pane.setStyle("-fx-background-color: black;");
 
         this.label = new HyperlinkLabel(String.format("[%s]", getTitleFromGif(gifSource)));
+        this.label.setPickOnBounds(false);
         this.label.setAccessibleText(gifSource.getBitlyUrl());
 
-        this.faveButton = new JFXButton();
+        this.faveButton = new Button();
         if (isFaved) {
             Text heartIcon =
                     FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.HEART, "10pt");

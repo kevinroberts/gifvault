@@ -1,7 +1,5 @@
 package com.vinberts.gifvault.controllers.main;
 
-import com.jfoenix.controls.JFXSpinner;
-import com.jfoenix.controls.JFXTabPane;
 import com.vinberts.gifvault.controllers.gihpy.GiphyController;
 import com.vinberts.gifvault.controllers.vault.VaultController;
 import com.vinberts.gifvault.utils.AppUtils;
@@ -12,10 +10,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Side;
 import javafx.scene.Parent;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tab;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyCode;
@@ -40,7 +35,7 @@ public class MainAppController {
     private NotificationPane notificationsPane;
 
     @FXML
-    private JFXSpinner spinner;
+    private ProgressIndicator spinner;
 
     @FXML
     private MenuItem settingsMenuItem;
@@ -58,7 +53,7 @@ public class MainAppController {
     private MenuBar mainMenuBar;
 
     @FXML
-    private JFXTabPane tabPane;
+    private TabPane tabPane;
 
     @FXML
     private Tab giphyTab;

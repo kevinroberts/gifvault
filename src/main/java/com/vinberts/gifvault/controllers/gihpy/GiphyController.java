@@ -1,8 +1,5 @@
 package com.vinberts.gifvault.controllers.gihpy;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
-import com.jfoenix.controls.JFXTextField;
 import com.trievosoftware.giphy4j.Giphy;
 import com.trievosoftware.giphy4j.entity.giphy.GiphyData;
 import com.trievosoftware.giphy4j.entity.search.SearchFeed;
@@ -26,6 +23,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventTarget;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
@@ -55,24 +55,24 @@ public class GiphyController extends ChildController {
     private AnchorPane giphyPane;
 
     @FXML
-    private JFXButton nextPageButton;
+    private Button nextPageButton;
 
     @FXML
-    private JFXButton prevPageButton;
+    private Button prevPageButton;
 
     @FXML
-    private JFXButton searchButton;
+    private Button searchButton;
 
     @FXML
     private GridView gridView;
 
     @FXML
-    private JFXComboBox giphyComboBox;
+    private ComboBox giphyComboBox;
 
     // When JDK 12+ is used JFX text field has issues
     // https://stackoverflow.com/questions/55889654/illegalaccessexception-for-jfxtextfield-with-java-sdk-12
     @FXML
-    private JFXTextField searchGiphyTextField;
+    private TextField searchGiphyTextField;
 
     private String giphySearchOptions[] =
             { ALL_GIFS, ALL_STICKERS };
@@ -159,7 +159,9 @@ public class GiphyController extends ChildController {
             log.debug("Grid cell clicked");
             GridCell gridCell = ((GridCell) comp);
             GiphyCell cell = (GiphyCell) gridCell.getGraphic();
-            if (node instanceof Text) {
+            if (node.getParent() instanceof Button) {
+                handleFavoriteAction(node.getParent(), cell);
+            } else if (node instanceof Text) {
                 String anchorLink = cell.getAnchorLink();
                 if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                     try {
@@ -169,53 +171,57 @@ public class GiphyController extends ChildController {
                         log.error("IOException occurred", ex);
                     }
                 }
-            } else if (node instanceof JFXButton) {
-                if (!node.getStyleClass().contains(HEARTED_CLASS)) {
-                    log.debug("adding gif as favorite");
-                    GifFolder folder = DatabaseHelper.getUncategorizedFolder();
-                    GifVault gifVault = AppUtils.prepareNewVaultEntryForGif(Optional.of(folder), cell);
-                    DatabaseHelper.insertNewGifVaultEntry(gifVault);
+            } else if (node instanceof Button) {
+                handleFavoriteAction(node, cell);
+            }
+        }
+    }
 
-                    boolean success = DatabaseHelper.insertNewGiphyEntry(cell, gifVault);
-                    if (!success) {
-                        AlertMaker.showErrorMessage("Oops", "Something went wrong trying to add this giphy to your favorites.");
-                    } else {
-                        FavoritedEvent favoritedEvent = new FavoritedEvent(cell, this.getMainAppController().getVaultTab().getContent(), FavoritedEvent.FAVORITED, gifVault);
-                        Text heartIcon =
-                                FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.HEART, "10pt");
-                        ((JFXButton) node).setGraphic(heartIcon);
-                        node.setAccessibleText(FAVED_TEXT);
-                        node.getStyleClass().add(HEARTED_CLASS);
-                        try {
-                            AppUtils.createFaveFolderAndDownloadAsset(gifVault,
-                                    cell.getGiphyData().getImages().getOriginalMp4().getMp4(),
-                                    cell.getGiphyData().getImages().getOriginal().getUrl(),
-                                    this.getMainAppController().getVaultTab(),
-                                    favoritedEvent);
-                        } catch (IOException e) {
-                            AlertMaker.showErrorMessage("Oops", "Something went wrong trying to add this giphy to your favorites.");
-                        }
-                    }
-                } else if (node.getStyleClass().contains(HEARTED_CLASS)) {
-                    log.debug("removing gif as favorite");
-                    String vaultId = DatabaseHelper.deleteGiphyGifById(cell.getGiphyData().getId(), true);
-                    if (StringUtils.isNotEmpty(vaultId)) {
-                        GifVault vaultToBeRemoved = new GifVault();
-                        vaultToBeRemoved.setId(vaultId);
-                        FavoritedEvent unFaveEvent = new FavoritedEvent(cell,
-                                this.getMainAppController().getVaultTab().getContent(),
-                                FavoritedEvent.UNFAVORITED, vaultToBeRemoved);
-                        this.getMainAppController().getVaultTab().getContent().fireEvent(unFaveEvent);
-                        DatabaseHelper.deleteGifVaultById(vaultId);
-                        Text heartIcon =
-                                FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.HEART_ALT, "10pt");
-                        ((JFXButton) node).setGraphic(heartIcon);
-                        node.setAccessibleText(UNFAVED_TEXT);
-                        node.getStyleClass().remove(HEARTED_CLASS);
-                    } else {
-                        AlertMaker.showErrorMessage("Oops", "Something went wrong trying to remove this giphy to your favorites.");
-                    }
+    private void handleFavoriteAction(Node node, GiphyCell cell) {
+        if (!node.getStyleClass().contains(HEARTED_CLASS)) {
+            log.debug("adding gif as favorite");
+            GifFolder folder = DatabaseHelper.getUncategorizedFolder();
+            GifVault gifVault = AppUtils.prepareNewVaultEntryForGif(Optional.of(folder), cell);
+            DatabaseHelper.insertNewGifVaultEntry(gifVault);
+
+            boolean success = DatabaseHelper.insertNewGiphyEntry(cell, gifVault);
+            if (!success) {
+                AlertMaker.showErrorMessage("Oops", "Something went wrong trying to add this giphy to your favorites.");
+            } else {
+                FavoritedEvent favoritedEvent = new FavoritedEvent(cell, this.getMainAppController().getVaultTab().getContent(), FavoritedEvent.FAVORITED, gifVault);
+                Text heartIcon =
+                        FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.HEART, "10pt");
+                ((Button) node).setGraphic(heartIcon);
+                node.setAccessibleText(FAVED_TEXT);
+                node.getStyleClass().add(HEARTED_CLASS);
+                try {
+                    AppUtils.createFaveFolderAndDownloadAsset(gifVault,
+                            cell.getGiphyData().getImages().getOriginalMp4().getMp4(),
+                            cell.getGiphyData().getImages().getOriginal().getUrl(),
+                            this.getMainAppController().getVaultTab(),
+                            favoritedEvent);
+                } catch (IOException e) {
+                    AlertMaker.showErrorMessage("Oops", "Something went wrong trying to add this giphy to your favorites.");
                 }
+            }
+        } else if (node.getStyleClass().contains(HEARTED_CLASS)) {
+            log.debug("removing gif as favorite");
+            String vaultId = DatabaseHelper.deleteGiphyGifById(cell.getGiphyData().getId(), true);
+            if (StringUtils.isNotEmpty(vaultId)) {
+                GifVault vaultToBeRemoved = new GifVault();
+                vaultToBeRemoved.setId(vaultId);
+                FavoritedEvent unFaveEvent = new FavoritedEvent(cell,
+                        this.getMainAppController().getVaultTab().getContent(),
+                        FavoritedEvent.UNFAVORITED, vaultToBeRemoved);
+                this.getMainAppController().getVaultTab().getContent().fireEvent(unFaveEvent);
+                DatabaseHelper.deleteGifVaultById(vaultId);
+                Text heartIcon =
+                        FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.HEART_ALT, "10pt");
+                ((Button) node).setGraphic(heartIcon);
+                node.setAccessibleText(UNFAVED_TEXT);
+                node.getStyleClass().remove(HEARTED_CLASS);
+            } else {
+                AlertMaker.showErrorMessage("Oops", "Something went wrong trying to remove this giphy to your favorites.");
             }
         }
     }

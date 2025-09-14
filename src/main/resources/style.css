@@ -56,6 +56,7 @@
     -fx-background-radius: 20px;
     -fx-font-size: 12pt;
     -fx-cursor: hand;
+    -fx-pick-on-bounds: true;
 }
 
 .check-box {
@@ -91,7 +92,7 @@
 }
 
 .anchor {
-    -fx-cursor: hand;
+    -fx-cursor: pointer;
 }
 
 .folder-selector {
@@ -321,7 +322,7 @@
 {
     -fx-background-radius: 5px;
     -fx-fill: derive(blue, 80%);
-    -fx-cursor: hand;
+    -fx-cursor: pointer;
 }
 
 /*Checkbox*/

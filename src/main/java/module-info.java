@@ -10,7 +10,6 @@ module gifvault {
     requires javafx.web;
     requires java.desktop;
     requires java.sql;
-    requires com.jfoenix;
     requires org.controlsfx.controls;
     requires uk.co.caprica.vlcj;
     requires uk.co.caprica.vlcj.javafx;

@@ -1,10 +1,10 @@
 package com.vinberts.gifvault.controllers.settings;
 
-import com.jfoenix.controls.JFXTextField;
 import com.vinberts.gifvault.utils.AlertMaker;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.TextField;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
@@ -18,10 +18,10 @@ import java.util.ResourceBundle;
 public class SettingsController implements Initializable {
 
     @FXML
-    private JFXTextField giphyAPIKeyField;
+    private TextField giphyAPIKeyField;
 
     @FXML
-    private JFXTextField gifVaultFolderField;
+    private TextField gifVaultFolderField;
 
     SystemPreferences preferences;
 

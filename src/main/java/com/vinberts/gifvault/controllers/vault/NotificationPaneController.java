@@ -1,12 +1,12 @@
 package com.vinberts.gifvault.controllers.vault;
 
-import com.jfoenix.controls.JFXComboBox;
 import com.vinberts.gifvault.data.GifFolder;
 import com.vinberts.gifvault.database.DatabaseHelper;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 
 import java.net.URL;
@@ -22,7 +22,7 @@ public class NotificationPaneController implements Initializable {
     private Label infoTextLabel;
 
     @FXML
-    private JFXComboBox<GifFolder> folderChooserComboBox;
+    private ComboBox<GifFolder> folderChooserComboBox;
 
     private GifFolder[] folderSelectionOptions;
 

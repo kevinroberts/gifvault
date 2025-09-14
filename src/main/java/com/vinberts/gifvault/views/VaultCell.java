@@ -1,6 +1,5 @@
 package com.vinberts.gifvault.views;
 
-import com.jfoenix.controls.JFXButton;
 import com.vinberts.gifvault.data.GifVault;
 import com.vinberts.gifvault.events.DeleteVaultEvent;
 import com.vinberts.gifvault.events.SelectedVaultEvent;
@@ -8,6 +7,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.utils.FontAwesomeIconFactory;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
@@ -40,7 +40,7 @@ public class VaultCell extends VBox {
     private Pane pane;
     private BorderPane borderPane;
     private Label label;
-    private JFXButton removeButton;
+    private Button removeButton;
     private GifVault gifVault;
     private CheckBox selectionBox;
     private HBox controlsContainer;
@@ -95,9 +95,14 @@ public class VaultCell extends VBox {
             this.label.getStyleClass().add("anchor");
         }
 
-        this.removeButton = new JFXButton();
+        this.removeButton = new Button();
         Text trashIcon =
                 FontAwesomeIconFactory.get().createIcon(FontAwesomeIcon.TRASH, "10pt");
+        trashIcon.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {
+            log.debug("Trash icon clicked");
+            DeleteVaultEvent deleteVaultEvent = new DeleteVaultEvent(removeButton, removeButton, DeleteVaultEvent.DELETED, this);
+            this.fireEvent(deleteVaultEvent);
+        });
         removeButton.setGraphic(trashIcon);
 
         removeButton.addEventFilter(MouseEvent.MOUSE_RELEASED, event -> {

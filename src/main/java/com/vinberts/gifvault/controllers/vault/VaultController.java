@@ -1,7 +1,5 @@
 package com.vinberts.gifvault.controllers.vault;
 
-import com.jfoenix.controls.JFXButton;
-import com.jfoenix.controls.JFXComboBox;
 import com.vinberts.gifvault.controllers.ChildController;
 import com.vinberts.gifvault.controllers.settings.SystemPreferences;
 import com.vinberts.gifvault.data.GifFolder;
@@ -25,9 +23,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
@@ -39,12 +35,9 @@ import org.controlsfx.control.GridView;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.*;
 
 import static com.vinberts.gifvault.utils.AppConstants.UNCATEGORIZED;
 
@@ -54,16 +47,16 @@ import static com.vinberts.gifvault.utils.AppConstants.UNCATEGORIZED;
 public class VaultController extends ChildController {
 
     @FXML
-    private JFXButton manageFoldersButton;
+    private Button manageFoldersButton;
 
     @FXML
     private Label totalLabel;
 
     @FXML
-    private JFXButton nextPageButton;
+    private Button nextPageButton;
 
     @FXML
-    private JFXButton prevPageButton;
+    private Button prevPageButton;
 
     @FXML
     private AnchorPane vaultPane;
@@ -72,7 +65,7 @@ public class VaultController extends ChildController {
     private GridView gridView;
 
     @FXML
-    private JFXComboBox<GifFolder> folderSelectorComboBox;
+    private ComboBox<GifFolder> folderSelectorComboBox;
 
     private NotificationPaneController notificationPaneController;
 
@@ -172,8 +165,14 @@ public class VaultController extends ChildController {
             for (GifVault gifVault: gifVaultList) {
                 String mp4Path = preferences.getGifVaultFolderLocation() + File.separator
                         + gifVault.getStorageLocation() + File.separator + gifVault.getMp4Filename();
-                VaultCell vaultCell = new VaultCell(gifVault, mp4Path);
-                list.add(vaultCell);
+                Path path = Paths.get(mp4Path);
+                if (!path.toFile().exists()) {
+                    log.debug("gif vault file does not exist, removing from list");
+                    DatabaseHelper.deleteGifVaultById(gifVault.getId());
+                } else {
+                    VaultCell vaultCell = new VaultCell(gifVault, mp4Path);
+                    list.add(vaultCell);
+                }
             }
             gridView.setItems(list);
         });
